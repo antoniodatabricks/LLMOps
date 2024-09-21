@@ -1,0 +1,48 @@
+bundle:
+  name: llmops_pipeline
+
+resources:
+  jobs:
+    chain_and_validate_rag:
+      name: chain_and_validate_rag
+      job_clusters:
+        - job_cluster_key: llm-cluster
+          new_cluster:
+            spark_version: 14.3.x-cpu-ml-scala2.12
+            spark_conf:
+              spark.master: local[*, 4]
+              spark.databricks.cluster.profile: singleNode
+            azure_attributes:
+              first_on_demand: 1
+              availability: ON_DEMAND_AZURE
+              spot_bid_max_price: -1
+            node_type_id: Standard_E4d_v4
+            driver_node_type_id: Standard_E4d_v4
+            custom_tags:
+              ResourceClass: SingleNode
+            enable_elastic_disk: true
+            data_security_mode: SINGLE_USER
+            runtime_engine: STANDARD
+            num_workers: 0
+      tasks:
+        - task_key: chain_model
+          job_cluster_key: llm-cluster
+          notebook_task:
+            base_parameters:
+              par1: "xxx"
+              par2: "xxx"
+            notebook_path: Step 2 - Deploy RAG to DEV - Foundation Model.py
+        - task_key: spin_up_endpoint
+          job_cluster_key: llm-cluster
+          depends_on:
+            - task_key: chain_model
+          notebook_task:
+            base_parameters:
+              par1: "xxx"
+              par2: "xxx"
+            notebook_path: Step 3 - Spinning up a model serving endpoint.py
+
+targets:
+  development:
+    workspace:
+      host: https://adb-2332510266816567.7.azuredatabricks.net/
