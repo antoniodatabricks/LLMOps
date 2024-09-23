@@ -59,7 +59,7 @@ print(model_to_promote_uri)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Deploy to PROD as challenger
+# MAGIC # Deploy to PROD
 
 # COMMAND ----------
 
@@ -71,8 +71,7 @@ print(prod_model)
 copied_model_version = mlflow.register_model(
     model_uri=model_to_promote_uri,
     name=prod_model
-) 
-# What is the difference between this and copy model?
+)
 
 # COMMAND ----------
 

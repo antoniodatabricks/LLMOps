@@ -41,6 +41,15 @@ resources:
               par1: "xxx"
               par2: "xxx"
             notebook_path: src/Step 2 - Create Serving Endpoint.py
+        - task_key: evaluate_model
+          job_cluster_key: llm-cluster
+          depends_on:
+            - task_key: spin_up_endpoint
+          notebook_task:
+            base_parameters:
+              par1: "xxx"
+              par2: "xxx"
+            notebook_path: src/Step 3 - Evaluate the model.py
 
 targets:
   development:
