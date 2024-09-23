@@ -31,7 +31,7 @@ resources:
             base_parameters:
               par1: "xxx"
               par2: "xxx"
-            notebook_path: Step 2 - Deploy RAG to DEV - Foundation Model.py
+            notebook_path: src/Step 1 - Deploy RAG to DEV.py
         - task_key: spin_up_endpoint
           job_cluster_key: llm-cluster
           depends_on:
@@ -40,7 +40,7 @@ resources:
             base_parameters:
               par1: "xxx"
               par2: "xxx"
-            notebook_path: Step 3 - Spinning up a model serving endpoint.py
+            notebook_path: src/Step 2 - Create Serving Endpoint.py
 
 targets:
   development:
