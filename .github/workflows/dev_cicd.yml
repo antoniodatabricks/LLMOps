@@ -36,7 +36,7 @@ jobs:
       - run: databricks bundle deploy
         working-directory: ./llmops_pipeline
         env:
-          DATABRICKS_TOKEN: ${{ secrets.SP_TOKEN }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_WS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: development
 
   # Validate, deploy, and then run the bundle.
