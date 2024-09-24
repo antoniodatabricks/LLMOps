@@ -12,6 +12,13 @@ dbutils.notebook.run("Helper - Create Model Serving Endpoint", 0, {"model_name":
 
 # COMMAND ----------
 
+import time
+
+# Make the process sleep for 15 seconds
+time.sleep(15)
+
+# COMMAND ----------
+
 import requests
 import json
 
@@ -31,8 +38,10 @@ response = requests.post(
     url=f"{host}/serving-endpoints/{endpoint_name}/invocations", json=data, headers=headers
     )
 
-print(response.text)
+# Assert that the status code indicates success (2xx range)
+assert response.status_code == 200, f"Model Serving Endpoint in QA: Expected status code 200 but got {response.status_code}"
 
-# COMMAND ----------
+# You could also use the requests built-in success check:
+assert response.ok, f"Model Serving Endpoint in QA: Request failed with status code {response.status_code}"
 
 
