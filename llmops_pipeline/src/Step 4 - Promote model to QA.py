@@ -22,9 +22,9 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 model_to_promote = "llmops_dev.model_schema.basic_rag_demo_foundation_model"
-catalog_prod = "llmops_prod"
-schema_prod = "model_schema"
-model_name_prod = "basic_rag_demo_foundation_model"
+catalog_qa = "llmops_qa"
+schema_qa = "model_schema"
+model_name_qa = "basic_rag_demo_foundation_model"
 
 # COMMAND ----------
 
@@ -59,11 +59,11 @@ print(model_to_promote_uri)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Deploy to PROD as challenger
+# MAGIC # Deploy to PROD
 
 # COMMAND ----------
 
-prod_model = f"{catalog_prod}.{schema_prod}.{model_name_prod}"
+prod_model = f"{catalog_qa}.{schema_qa}.{model_name_qa}"
 print(prod_model)
 
 # COMMAND ----------
@@ -71,10 +71,9 @@ print(prod_model)
 copied_model_version = mlflow.register_model(
     model_uri=model_to_promote_uri,
     name=prod_model
-) 
-# What is the difference between this and copy model?
+)
 
 # COMMAND ----------
 
 client = mlflow.tracking.MlflowClient()
-client.set_registered_model_alias(name=f"{catalog_prod}.{schema_prod}.{model_name_prod}", alias="Champion", version=copied_model_version.version)
+client.set_registered_model_alias(name=f"{catalog_qa}.{schema_qa}.{model_name_qa}", alias="Champion", version=copied_model_version.version)
