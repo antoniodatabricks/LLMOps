@@ -40,7 +40,7 @@ resources:
             base_parameters:
               par1: "xxx"
               par2: "xxx"
-            notebook_path: src/Step 2 - Create Serving Endpoint.py
+            notebook_path: src/Step 2 - Create Serving Endpoint DEV.py
         - task_key: evaluate_model
           job_cluster_key: llm-cluster
           depends_on:
@@ -49,7 +49,7 @@ resources:
             base_parameters:
               par1: "xxx"
               par2: "xxx"
-            notebook_path: src/Step 3 - Evaluate the model.py
+            notebook_path: src/Step 3 - Evaluate the model DEV.py
 
     deploy_to_qa:
       name: deploy_to_qa
