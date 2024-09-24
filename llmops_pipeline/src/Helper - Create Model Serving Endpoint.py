@@ -27,8 +27,7 @@ host = dbutils.widgets.get("host")
 tracking_table_catalog = dbutils.widgets.get("tracking_table_catalog")
 tracking_table_schema = dbutils.widgets.get("tracking_table_schema")
 tracking_table_name = dbutils.widgets.get("tracking_table_name")
-
-endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
+endpoint_token = dbutils.widgets.get("endpoint_token")
 
 # COMMAND ----------
 
