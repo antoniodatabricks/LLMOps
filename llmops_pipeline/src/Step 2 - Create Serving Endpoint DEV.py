@@ -12,6 +12,13 @@ dbutils.notebook.run("Helper - Create Model Serving Endpoint", 0, {"model_name":
 
 # COMMAND ----------
 
+import time
+
+# Make the process sleep for 15 seconds
+time.sleep(15)
+
+# COMMAND ----------
+
 import requests
 import json
 
