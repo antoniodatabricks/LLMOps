@@ -12,4 +12,27 @@ tracking_table_name = "rag_app_realtime"
 
 # COMMAND ----------
 
+import requests
+import json
 
+data = {
+        "messages": 
+            [ 
+             {
+                 "role": "user", 
+                 "content": "What is GenAI?"
+             }
+            ]
+           }
+
+headers = {"Context-Type": "text/json", "Authorization": f"Bearer {endpoint_token}"}
+
+response = requests.post(
+    url=f"{host}/serving-endpoints/{endpoint_name}/invocations", json=data, headers=headers
+    )
+
+# Assert that the status code indicates success (2xx range)
+assert response.status_code == 200, f"Model Serving Endpoint in DEV: Expected status code 200 but got {response.status_code}"
+
+# You could also use the requests built-in success check:
+assert response.ok, f"Model Serving Endpoint in DEV: Request failed with status code {response.status_code}"
