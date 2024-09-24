@@ -31,7 +31,7 @@ resources:
             base_parameters:
               par1: "xxx"
               par2: "xxx"
-            notebook_path: Step 2 - Deploy RAG to DEV - Foundation Model.py
+            notebook_path: src/Step 1 - Deploy RAG to DEV.py
         - task_key: spin_up_endpoint
           job_cluster_key: llm-cluster
           depends_on:
@@ -40,9 +40,102 @@ resources:
             base_parameters:
               par1: "xxx"
               par2: "xxx"
-            notebook_path: Step 3 - Spinning up a model serving endpoint.py
+            notebook_path: src/Step 2 - Create Serving Endpoint DEV.py
+        - task_key: evaluate_model
+          job_cluster_key: llm-cluster
+          depends_on:
+            - task_key: spin_up_endpoint
+          notebook_task:
+            base_parameters:
+              par1: "xxx"
+              par2: "xxx"
+            notebook_path: src/Step 3 - Evaluate the model DEV.py
+
+    deploy_to_qa:
+      name: deploy_to_qa
+      job_clusters:
+        - job_cluster_key: llm-cluster
+          new_cluster:
+            spark_version: 14.3.x-cpu-ml-scala2.12
+            spark_conf:
+              spark.master: local[*, 4]
+              spark.databricks.cluster.profile: singleNode
+            azure_attributes:
+              first_on_demand: 1
+              availability: ON_DEMAND_AZURE
+              spot_bid_max_price: -1
+            node_type_id: Standard_E4d_v4
+            driver_node_type_id: Standard_E4d_v4
+            custom_tags:
+              ResourceClass: SingleNode
+            enable_elastic_disk: true
+            data_security_mode: SINGLE_USER
+            runtime_engine: STANDARD
+            num_workers: 0
+      tasks:
+        - task_key: promote_to_qa
+          job_cluster_key: llm-cluster
+          notebook_task:
+            base_parameters:
+              par1: "xxx"
+              par2: "xxx"
+            notebook_path: src/Step 4 - Promote model to QA.py
+        - task_key: spin_up_endpoint
+          job_cluster_key: llm-cluster
+          depends_on:
+            - task_key: promote_to_qa
+          notebook_task:
+            base_parameters:
+              par1: "xxx"
+              par2: "xxx"
+            notebook_path: src/Step 5 - Create Serving Endpoint QA.py
+
+    deploy_to_prod:
+      name: deploy_to_prod
+      job_clusters:
+        - job_cluster_key: llm-cluster
+          new_cluster:
+            spark_version: 14.3.x-cpu-ml-scala2.12
+            spark_conf:
+              spark.master: local[*, 4]
+              spark.databricks.cluster.profile: singleNode
+            azure_attributes:
+              first_on_demand: 1
+              availability: ON_DEMAND_AZURE
+              spot_bid_max_price: -1
+            node_type_id: Standard_E4d_v4
+            driver_node_type_id: Standard_E4d_v4
+            custom_tags:
+              ResourceClass: SingleNode
+            enable_elastic_disk: true
+            data_security_mode: SINGLE_USER
+            runtime_engine: STANDARD
+            num_workers: 0
+      tasks:
+        - task_key: promote_to_prod
+          job_cluster_key: llm-cluster
+          notebook_task:
+            base_parameters:
+              par1: "xxx"
+              par2: "xxx"
+            notebook_path: src/Step 6 - Promote model to PROD.py
+        - task_key: spin_up_endpoint
+          job_cluster_key: llm-cluster
+          depends_on:
+            - task_key: promote_to_prod
+          notebook_task:
+            base_parameters:
+              par1: "xxx"
+              par2: "xxx"
+            notebook_path: src/Step 7 - Create Serving Endpoint PROD.py
 
 targets:
   development:
     workspace:
       host: https://adb-2332510266816567.7.azuredatabricks.net/
+  qa:
+    workspace:
+      host: https://adb-2511663555363650.10.azuredatabricks.net/
+  prod:
+    workspace:
+      host: https://adb-2852242719721132.12.azuredatabricks.net/

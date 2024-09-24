@@ -36,15 +36,13 @@ embedding_model = "databricks-gte-large-en"
 vs_endpoint_name = "databricks_docs_vector_search"
 vs_index_fullname = "demo_prep.vector_search_data.databricks_documentation_vs_index"
 
-# Environment
-
-dbx_host = "adb-3630608912046230.10.azuredatabricks.net"
-dbx_token = ""
-model_endpoint_name = "fine_tuned_foundation_model"
-
 # Target UC
 target_model_catalog = "llmops_dev"
 target_model_schema = "model_schema"
+
+# Environment
+dependency_host = "https://adb-2332510266816567.7.azuredatabricks.net"
+dependency_token = dbutils.secrets.get(scope="creds", key="pat")
 
 # COMMAND ----------
 
@@ -129,7 +127,7 @@ Should
 
 # COMMAND ----------
 
-import mlflow
+import requests
 
 def query_llamaguard(chat, unsafe_categories=unsafe_categories):
     data = {
@@ -150,13 +148,13 @@ def query_llamaguard(chat, unsafe_categories=unsafe_categories):
         - If unsafe, a second line must include a comma-separated list of violated categories. [/INST]"""
         }
     
-    client = mlflow.deployments.get_deploy_client("databricks")
-    response = client.predict(
-        endpoint="llamaguard",
-        inputs=data
+    headers = {"Context-Type": "text/json", "Authorization": f"Bearer {dependency_token}"}
+
+    response = requests.post(
+        url=f"{dependency_host}/serving-endpoints/llamaguard/invocations", json=data, headers=headers
     )
 
-    response_list = response.choices[0]["text"].split("\n")
+    response_list = response.json()["choices"][0]["text"].split("\n")
     result = response_list[0].strip()
 
     if result == "safe":
@@ -243,7 +241,7 @@ print(f"Test embeddings: {embedding_model.embed_query('What is GenerativeAI?')[:
 
 def get_retriever(persist_dir: str = None):
     #Get the vector search index
-    vsc = VectorSearchClient()
+    vsc = VectorSearchClient(workspace_url=dependency_host, personal_access_token=dependency_token)
     vs_index = vsc.get_index(
         endpoint_name=vs_endpoint_name,
         index_name=vs_index_fullname
