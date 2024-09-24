@@ -36,12 +36,6 @@ embedding_model = "databricks-gte-large-en"
 vs_endpoint_name = "databricks_docs_vector_search"
 vs_index_fullname = "demo_prep.vector_search_data.databricks_documentation_vs_index"
 
-# Environment
-
-dbx_host = "adb-3630608912046230.10.azuredatabricks.net"
-dbx_token = ""
-model_endpoint_name = "fine_tuned_foundation_model"
-
 # Target UC
 target_model_catalog = "llmops_dev"
 target_model_schema = "model_schema"
