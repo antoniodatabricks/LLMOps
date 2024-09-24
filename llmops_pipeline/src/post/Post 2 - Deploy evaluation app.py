@@ -22,7 +22,7 @@ dbutils.library.restartPython()
 # COMMAND ----------
 
 model_name = "llmops_prod.model_schema.basic_rag_demo_foundation_model"
-host = "https://adb-2332510266816567.7.azuredatabricks.net"
+host = "https://xxx.x.azuredatabricks.net"
 endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
 
 # COMMAND ----------

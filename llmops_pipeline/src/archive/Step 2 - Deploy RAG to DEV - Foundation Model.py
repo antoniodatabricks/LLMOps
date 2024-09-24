@@ -52,7 +52,7 @@ vs_index_fullname = "demo_prep.vector_search_data.databricks_documentation_vs_in
 
 # Environment
 
-dbx_host = "adb-3630608912046230.10.azuredatabricks.net"
+dbx_host = "xxx.x.azuredatabricks.net"
 dbx_token = ""
 model_endpoint_name = "fine_tuned_foundation_model"
 

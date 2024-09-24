@@ -1,7 +1,7 @@
 # Databricks notebook source
-host = "https://adb-2332510266816567.7.azuredatabricks.net"
+host = "https://xxx.x.azuredatabricks.net"
 endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
-host_dependency = "https://adb-2332510266816567.7.azuredatabricks.net"
+host_dependency = "https://xxx.x.azuredatabricks.net"
 endpoint_token_dependency = dbutils.secrets.get(scope="creds", key="pat_dependency")
 endpoint_name = "llm_validation_endpoint"
 tracking_table_catalog = "llmops_dev"

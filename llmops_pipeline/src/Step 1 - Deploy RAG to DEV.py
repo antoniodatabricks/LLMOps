@@ -41,7 +41,7 @@ target_model_catalog = "llmops_dev"
 target_model_schema = "model_schema"
 
 # Environment
-dependency_host = "https://adb-2332510266816567.7.azuredatabricks.net"
+dependency_host = "https://xxx.x.azuredatabricks.net"
 dependency_token = dbutils.secrets.get(scope="creds", key="pat")
 
 # COMMAND ----------

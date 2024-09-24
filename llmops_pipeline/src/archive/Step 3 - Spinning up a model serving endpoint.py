@@ -92,7 +92,7 @@ endpoint_config_dict = {
                                 "scale_to_zero_enabled": scale_to_zero,
                                 "workload_type": workload_type,
                                 "environment_vars": {
-                                    "DATABRICKS_HOST": "https://adb-3630608912046230.10.azuredatabricks.net",
+                                    "DATABRICKS_HOST": "https://xxx.x.azuredatabricks.net",
                                     "DATABRICKS_TOKEN": ""
                                     }
                                 }

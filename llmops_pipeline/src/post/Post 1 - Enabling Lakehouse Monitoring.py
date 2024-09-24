@@ -21,7 +21,7 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
-endpoint_host = "https://adb-2332510266816567.7.azuredatabricks.net"
+endpoint_host = "https://xxx.x.azuredatabricks.net"
 endpoint_name = "llm_prod_endpoint"
 inference_table_name = "llmops_prod.model_tracking.rag_app_realtime_payload"
 inference_processed_table = "llmops_prod.model_tracking.rag_app_realtime_payload_processed"

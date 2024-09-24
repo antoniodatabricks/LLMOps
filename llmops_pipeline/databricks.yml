@@ -132,10 +132,10 @@ resources:
 targets:
   development:
     workspace:
-      host: https://adb-2332510266816567.7.azuredatabricks.net/
+      host: https://xxx.x.azuredatabricks.net/
   qa:
     workspace:
-      host: https://adb-2511663555363650.10.azuredatabricks.net/
+      host: https://xxx.x.azuredatabricks.net/
   prod:
     workspace:
-      host: https://adb-2852242719721132.12.azuredatabricks.net/
+      host: https://xxx.x.azuredatabricks.net/
