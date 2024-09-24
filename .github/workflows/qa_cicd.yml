@@ -57,7 +57,7 @@ jobs:
 
       # Run the Databricks workflow named "my-job" as defined in the
       # bundle that was just deployed.
-      - run: databricks bundle run chain_and_validate_rag --refresh-all
+      - run: databricks bundle run deploy_to_qa --refresh-all
         working-directory: ./llmops_pipeline
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_QA_WS_TOKEN }}
