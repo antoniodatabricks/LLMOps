@@ -34,14 +34,11 @@ vs_index_fullname = dbutils.widgets.get("vs_index_fullname")
 # Target UC
 target_dev_model_name = dbutils.widgets.get("target_dev_model_name")
 
-# Environment
-dependency_host = dbutils.widgets.get("dependency_host")
-dependency_token_scope = dbutils.widgets.get("dependency_token_scope")
-dependency_token_secret = dbutils.widgets.get("dependency_token_secret")
-dependency_token = dbutils.secrets.get(scope=dependency_token_scope, key=dependency_token_secret)
-
 # LLamaGuard guardrail endpoint
-llma_guard_endpoint_name = dbutils.widgets.get("llma_guard_endpoint_name")
+llma_guard_endpoint = dbutils.widgets.get("llma_guard_endpoint")
+llma_guard_endpoint_token_scope = dbutils.widgets.get("llma_guard_endpoint_token_scope")
+llma_guard_endpoint_token_secret = dbutils.widgets.get("llma_guard_endpoint_token_secret")
+llma_guard_endpoint_token = dbutils.secrets.get(scope=llma_guard_endpoint_token_scope, key=llma_guard_endpoint_token_secret)
 
 # COMMAND ----------
 
@@ -143,10 +140,10 @@ def query_llamaguard(chat, unsafe_categories=unsafe_categories):
         - If unsafe, a second line must include a comma-separated list of violated categories. [/INST]"""
         }
     
-    headers = {"Context-Type": "text/json", "Authorization": f"Bearer {dependency_token}"}
+    headers = {"Context-Type": "text/json", "Authorization": f"Bearer {llma_guard_endpoint_token}"}
 
     response = requests.post(
-        url=f"{dependency_host}/serving-endpoints/llamaguard/invocations", json=data, headers=headers
+        url=f"{llma_guard_endpoint}", json=data, headers=headers
     )
 
     response_list = response.json()["choices"][0]["text"].split("\n")
