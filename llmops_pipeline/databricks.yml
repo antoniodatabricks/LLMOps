@@ -37,6 +37,7 @@ resources:
               dependency_host: "https://adb-2332510266816567.7.azuredatabricks.net/"
               dependency_token_scope: "creds"
               dependency_token_secret: "pat"
+              llma_guard_endpoint_name: "llamaguard"
             notebook_path: src/Step 1 - Deploy RAG to DEV.py
         - task_key: spin_up_endpoint
           job_cluster_key: llm-cluster
