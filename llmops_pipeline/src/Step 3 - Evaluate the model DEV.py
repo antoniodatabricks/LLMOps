@@ -23,10 +23,14 @@ dbutils.library.restartPython()
 
 dev_endpoint_name = dbutils.widgets.get("dev_endpoint_name")
 dev_endpoint_host = dbutils.widgets.get("dev_endpoint_host")
-dev_endpoint_token = dbutils.widgets.get("dev_endpoint_token")
+dev_endpoint_token_scope = dbutils.widgets.get("dev_endpoint_token_scope")
+dev_endpoint_token_secret = dbutils.widgets.get("dev_endpoint_token_secret")
+dev_endpoint_token = dbutils.secrets.get(scope=dev_endpoint_token_scope, key=dev_endpoint_token_secret)
 prod_endpoint_name = dbutils.widgets.get("prod_endpoint_name")
 prod_endpoint_host = dbutils.widgets.get("prod_endpoint_host")
-prod_endpoint_token = dbutils.widgets.get("prod_endpoint_token")
+prod_endpoint_token_scope = dbutils.widgets.get("prod_endpoint_token_scope")
+prod_endpoint_token_secret = dbutils.widgets.get("prod_endpoint_token_secret")
+prod_endpoint_token = dbutils.secrets.get(scope=prod_endpoint_token_scope, key=prod_endpoint_token_secret)
 eval_dataset = dbutils.widgets.get("eval_dataset")
 
 # COMMAND ----------

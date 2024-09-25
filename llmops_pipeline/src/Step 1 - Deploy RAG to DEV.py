@@ -36,7 +36,9 @@ target_dev_model_name = dbutils.widgets.get("target_dev_model_name")
 
 # Environment
 dependency_host = dbutils.widgets.get("dependency_host")
-dependency_token = dbutils.widgets.get("dependency_token")
+dependency_token_scope = dbutils.widgets.get("dependency_token_scope")
+dependency_token_secret = dbutils.widgets.get("dependency_token_secret")
+dependency_token = dbutils.secrets.get(scope=dependency_token_scope, key=dependency_token_secret)
 
 # LLamaGuard guardrail endpoint
 llma_guard_endpoint_name = dbutils.widgets.get("llma_guard_endpoint_name")

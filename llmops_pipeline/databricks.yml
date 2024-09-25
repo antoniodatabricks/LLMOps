@@ -34,8 +34,9 @@ resources:
               vs_endpoint_name: "databricks_docs_vector_search"
               vs_index_fullname: "demo_prep.vector_search_data.databricks_documentation_vs_index"
               target_dev_model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model"
-              dependency_host: ${{ secrets.DATABRICKS_DEV_WS }}
-              dependency_token: ${{ secrets.DATABRICKS_DEV_WS_TOKEN }}
+              dependency_host: "https://adb-2332510266816567.7.azuredatabricks.net/"
+              dependency_token_scope: "creds"
+              dependency_token_secret: "pat"
             notebook_path: src/Step 1 - Deploy RAG to DEV.py
         - task_key: spin_up_endpoint
           job_cluster_key: llm-cluster
@@ -43,10 +44,12 @@ resources:
             - task_key: chain_model
           notebook_task:
             base_parameters:
-              host: ${{ secrets.DATABRICKS_DEV_WS }}
-              endpoint_token: ${{ secrets.DATABRICKS_DEV_WS_TOKEN }}
-              host_dependency: ${{ secrets.DATABRICKS_DEV_WS }}
-              endpoint_token_dependency: ${{ secrets.DATABRICKS_DEV_WS_TOKEN }}
+              host: "https://adb-2332510266816567.7.azuredatabricks.net/"
+              endpoint_token_scope: "creds"
+              endpoint_token_secret: "pat"
+              host_dependency: "https://adb-2332510266816567.7.azuredatabricks.net/"
+              endpoint_token_dependency_scope: "creds"
+              endpoint_token_dependency_secret: "pat"
               endpoint_name: "llm_validation_endpoint"
               tracking_table_catalog: "llmops_dev"
               tracking_table_schema: "model_tracking"
@@ -59,11 +62,13 @@ resources:
           notebook_task:
             base_parameters:
               dev_endpoint_name: "llm_validation_endpoint"
-              dev_endpoint_host: ${{ secrets.DATABRICKS_DEV_WS }}
-              dev_endpoint_token: ${{ secrets.DATABRICKS_DEV_WS_TOKEN }}
+              dev_endpoint_host: "https://adb-2332510266816567.7.azuredatabricks.net/"
+              dev_endpoint_token_scope: "creds"
+              dev_endpoint_token_secret: "pat"
               prod_endpoint_name: "prd_llm_endpoint"
-              prod_endpoint_host: ${{ secrets.DATABRICKS_PROD_WS }}
-              prod_endpoint_token: ${{ secrets.DATABRICKS_PROD_WS_TOKEN }}
+              prod_endpoint_host: "https://adb-2852242719721132.12.azuredatabricks.net/"
+              prod_endpoint_token_scope: "creds"
+              prod_endpoint_token_secret: "pat_prod"
               eval_dataset: "demo_prep.vector_search_data.eval_set_databricks_documentation"
             notebook_path: src/Step 3 - Evaluate the model DEV.py
 
@@ -148,10 +153,10 @@ resources:
 targets:
   development:
     workspace:
-      host: ${{ secrets.DATABRICKS_DEV_WS }}
+      host: https://adb-2332510266816567.7.azuredatabricks.net/
   qa:
     workspace:
-      host: ${{ secrets.DATABRICKS_QA_WS }}
+      host: https://adb-2511663555363650.10.azuredatabricks.net/
   prod:
     workspace:
-      host: ${{ secrets.DATABRICKS_PROD_WS }}
+      host: https://adb-2852242719721132.12.azuredatabricks.net/
