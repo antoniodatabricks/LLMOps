@@ -30,6 +30,10 @@ embedding_model = dbutils.widgets.get("embedding_model")
 # Vector Search
 vs_endpoint_name = dbutils.widgets.get("vs_endpoint_name")
 vs_index_fullname = dbutils.widgets.get("vs_index_fullname")
+vs_host = dbutils.widgets.get("vs_host")
+vs_token_scope = dbutils.widgets.get("vs_token_scope")
+vs_token_secret = dbutils.widgets.get("vs_token_secret")
+vs_token = dbutils.secrets.get(scope=vs_token_scope, key=vs_token_secret)
 
 # Target UC
 target_dev_model_name = dbutils.widgets.get("target_dev_model_name")
@@ -229,7 +233,7 @@ print(f"Test embeddings: {embedding_model.embed_query('What is GenerativeAI?')[:
 
 def get_retriever(persist_dir: str = None):
     #Get the vector search index
-    vsc = VectorSearchClient(workspace_url=dependency_host, personal_access_token=dependency_token)
+    vsc = VectorSearchClient(workspace_url=vs_host, personal_access_token=vs_token)
     vs_index = vsc.get_index(
         endpoint_name=vs_endpoint_name,
         index_name=vs_index_fullname
