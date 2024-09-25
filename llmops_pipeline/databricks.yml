@@ -48,13 +48,13 @@ resources:
             - task_key: chain_model
           notebook_task:
             base_parameters:
-              host: "https://adb-2332510266816567.7.azuredatabricks.net/"
+              endpoint_name: "llm_validation_endpoint"
+              endpoint_api: "https://adb-2332510266816567.7.azuredatabricks.net/serving-endpoints/llm_validation_endpoint/invocations"
               endpoint_token_scope: "creds"
               endpoint_token_secret: "pat"
               host_dependency: "https://adb-2332510266816567.7.azuredatabricks.net/"
               endpoint_token_dependency_scope: "creds"
               endpoint_token_dependency_secret: "pat"
-              endpoint_name: "llm_validation_endpoint"
               tracking_table_catalog: "llmops_dev"
               tracking_table_schema: "model_tracking"
               tracking_table_name: "rag_app_realtime"
