@@ -44,6 +44,9 @@ llma_guard_endpoint_token_scope = dbutils.widgets.get("llma_guard_endpoint_token
 llma_guard_endpoint_token_secret = dbutils.widgets.get("llma_guard_endpoint_token_secret")
 llma_guard_endpoint_token = dbutils.secrets.get(scope=llma_guard_endpoint_token_scope, key=llma_guard_endpoint_token_secret)
 
+# Targetting model name
+model_name = dbutils.widgets.get("model_name")
+
 # COMMAND ----------
 
 # MAGIC %md
@@ -342,18 +345,3 @@ with mlflow.start_run(run_name="basic_rag_bot"):
         ],
         signature=signature
       )
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC # Test model
-
-# COMMAND ----------
-
-import mlflow.pyfunc
-model_version_uri = "models:/llmops_dev.model_schema.basic_rag_demo_foundation_model/20"
-champion_version = mlflow.pyfunc.load_model(model_version_uri)
-
-# COMMAND ----------
-
-champion_version.predict(question)

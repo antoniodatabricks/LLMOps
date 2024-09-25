@@ -40,6 +40,7 @@ resources:
               llma_guard_endpoint: "https://adb-2332510266816567.7.azuredatabricks.net/serving-endpoints/llamaguard/invocations"
               llma_guard_endpoint_token_scope: "creds"
               llma_guard_endpoint_token_secret: "pat"
+              model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model"
             notebook_path: src/Step 1 - Deploy RAG to DEV.py
         - task_key: spin_up_endpoint
           job_cluster_key: llm-cluster
