@@ -29,8 +29,13 @@ resources:
           job_cluster_key: llm-cluster
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
+              foundation_model_endpoint: "databricks-llama-2-70b-chat"
+              embedding_model: "databricks-gte-large-en"
+              vs_endpoint_name: "databricks_docs_vector_search"
+              vs_index_fullname: "demo_prep.vector_search_data.databricks_documentation_vs_index"
+              target_dev_model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model"
+              dependency_host: ${{ secrets.DATABRICKS_DEV_WS }}
+              dependency_token: ${{ secrets.DATABRICKS_DEV_WS_TOKEN }}
             notebook_path: src/Step 1 - Deploy RAG to DEV.py
         - task_key: spin_up_endpoint
           job_cluster_key: llm-cluster
@@ -38,8 +43,14 @@ resources:
             - task_key: chain_model
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
+              host: ${{ secrets.DATABRICKS_DEV_WS }}
+              endpoint_token: ${{ secrets.DATABRICKS_DEV_WS_TOKEN }}
+              host_dependency: ${{ secrets.DATABRICKS_DEV_WS }}
+              endpoint_token_dependency: ${{ secrets.DATABRICKS_DEV_WS_TOKEN }}
+              endpoint_name: "llm_validation_endpoint"
+              tracking_table_catalog: "llmops_dev"
+              tracking_table_schema: "model_tracking"
+              tracking_table_name: "rag_app_realtime"
             notebook_path: src/Step 2 - Create Serving Endpoint DEV.py
         - task_key: evaluate_model
           job_cluster_key: llm-cluster
@@ -47,8 +58,13 @@ resources:
             - task_key: spin_up_endpoint
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
+              dev_endpoint_name: "llm_validation_endpoint"
+              dev_endpoint_host: ${{ secrets.DATABRICKS_DEV_WS }}
+              dev_endpoint_token: ${{ secrets.DATABRICKS_DEV_WS_TOKEN }}
+              prod_endpoint_name: "prd_llm_endpoint"
+              prod_endpoint_host: ${{ secrets.DATABRICKS_PROD_WS }}
+              prod_endpoint_token: ${{ secrets.DATABRICKS_PROD_WS_TOKEN }}
+              eval_dataset: "demo_prep.vector_search_data.eval_set_databricks_documentation"
             notebook_path: src/Step 3 - Evaluate the model DEV.py
 
     deploy_to_qa:
@@ -132,10 +148,10 @@ resources:
 targets:
   development:
     workspace:
-      host: https://xxx.x.azuredatabricks.net/
+      host: ${{ secrets.DATABRICKS_DEV_WS }}
   qa:
     workspace:
-      host: https://xxx.x.azuredatabricks.net/
+      host: ${{ secrets.DATABRICKS_QA_WS }}
   prod:
     workspace:
-      host: https://xxx.x.azuredatabricks.net/
+      host: ${{ secrets.DATABRICKS_PROD_WS }}

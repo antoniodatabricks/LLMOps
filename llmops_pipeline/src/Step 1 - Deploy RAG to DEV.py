@@ -21,28 +21,25 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
-# Model URI
-
-model_name = "demo_prep.fine_tunning.fine_tuned_meta_llama_llama_2_70b_chat_hf"
-model_version = "1"
-model_uri = f"models:/{model_name}/{model_version}"
+# Model endpoint
+foundation_model_endpoint = dbutils.widgets.get("foundation_model_endpoint")
 
 # Model embedding - The embedding model used to generate the vector seatch index should be the same as the one used to embed the question.
-
-embedding_model = "databricks-gte-large-en"
+embedding_model = dbutils.widgets.get("embedding_model")
 
 # Vector Search
-
-vs_endpoint_name = "databricks_docs_vector_search"
-vs_index_fullname = "demo_prep.vector_search_data.databricks_documentation_vs_index"
+vs_endpoint_name = dbutils.widgets.get("vs_endpoint_name")
+vs_index_fullname = dbutils.widgets.get("vs_index_fullname")
 
 # Target UC
-target_model_catalog = "llmops_dev"
-target_model_schema = "model_schema"
+target_dev_model_name = dbutils.widgets.get("target_dev_model_name")
 
 # Environment
-dependency_host = "https://xxx.x.azuredatabricks.net"
-dependency_token = dbutils.secrets.get(scope="creds", key="pat")
+dependency_host = dbutils.widgets.get("dependency_host")
+dependency_token = dbutils.widgets.get("dependency_token")
+
+# LLamaGuard guardrail endpoint
+llma_guard_endpoint_name = dbutils.widgets.get("llma_guard_endpoint_name")
 
 # COMMAND ----------
 
@@ -55,7 +52,7 @@ from langchain.chat_models import ChatDatabricks
 
 
 # Test Databricks Foundation LLM model
-chat_model = ChatDatabricks(endpoint="databricks-llama-2-70b-chat", max_tokens = 300)
+chat_model = ChatDatabricks(endpoint=foundation_model_endpoint, max_tokens = 300)
 print(f"Test chat model: {chat_model.invoke('What is Generative AI?')}")
 
 # COMMAND ----------
@@ -63,10 +60,6 @@ print(f"Test chat model: {chat_model.invoke('What is Generative AI?')}")
 # MAGIC %md
 # MAGIC # Implement guardrails with Llma Guard
 # MAGIC - This assumes that we already have Llama guard endpoint deployed
-
-# COMMAND ----------
-
-llma_guard_endpoint_name = "llamaguard"
 
 # COMMAND ----------
 
@@ -225,10 +218,6 @@ def custom_chain(prompt):
 
 # COMMAND ----------
 
-embedding_model = "databricks-gte-large-en"
-
-# COMMAND ----------
-
 from databricks.vector_search.client import VectorSearchClient
 from langchain.vectorstores import DatabricksVectorSearch
 from langchain.embeddings import DatabricksEmbeddings
@@ -284,26 +273,12 @@ from operator import itemgetter
 from langchain.schema.runnable import RunnableLambda
 
 
-#TEMPLATE = """You are an assistant for GENAI teaching class. You are answering questions related to Generative AI and how it impacts humans life. #If the question is not related to one of these topics, kindly decline to answer. If you don't know the answer, just say that you don't know, #don't try to make up an answer. Keep the answer as concise as possible.
-#Use the following pieces of context to answer the question at the end:
-
-#<context>
-#{context}
-#</context>
-
-#Question: {input}
-
-#Answer:
-#"""
-
 prompt = ChatPromptTemplate.from_messages(
     [  
         ("system", "You are an assistant for GENAI teaching class. You are answering questions related to Generative AI and how it impacts humans life. If the question is not related to one of these topics, kindly decline to answer. If you don't know the answer, just say that you don't know, don't try to make up an answer. Keep the answer as concise as possible. Use the following pieces of context to answer the question at the end: {context}"), # Contains the instructions from the configuration
         ("user", "{question}") #user's questions
     ]
 )
-
-#prompt = PromptTemplate(template=TEMPLATE, input_variables=["context", "input"])
 
 retriever = get_retriever()
 
@@ -320,26 +295,6 @@ chain = (
     | StrOutputParser()
 )
 
-#question_answer_chain = create_stuff_documents_chain(custom_chain, prompt)
-#chain = create_retrieval_chain(retriever, question_answer_chain)
-
-#chain = RetrievalQA.from_chain_type(
-#    llm=chat_model,
-#    chain_type="stuff",
-#    retriever=get_retriever(),
-#    chain_type_kwargs={"prompt": prompt}
-#)
-
-#chain = (
-#        { 
-#         "context": get_retriever(), 
-#         "input": RunnablePassthrough()
-#        }
-#        | TEMPLATE
-#        | custom_chain
-#        | StrOutputParser()
-#)
-
 # COMMAND ----------
 
 question = {"messages": [ {"role": "user", "content": "What is GenAI?"}]}
@@ -347,10 +302,6 @@ answer = chain.invoke(question)
 print(answer)
 
 # COMMAND ----------
-
-#question = "How does Generative AI impact humans?"
-#answer = chain.invoke(question)
-#print(answer)
 
 chain.invoke({"messages": [ {"role": "user", "content": "How do I rob a bank??"}]})
 
@@ -371,7 +322,6 @@ import mlflow
 import langchain
 
 mlflow.set_registry_uri("databricks-uc")
-model_name = f"{target_model_catalog}.{target_model_schema}.basic_rag_demo_foundation_model"
 
 # Log the model to MLflow
 with mlflow.start_run(run_name="basic_rag_bot"):
@@ -404,7 +354,3 @@ champion_version = mlflow.pyfunc.load_model(model_version_uri)
 # COMMAND ----------
 
 champion_version.predict(question)
-
-# COMMAND ----------
-
-

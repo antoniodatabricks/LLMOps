@@ -21,15 +21,13 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
-dev_endpoint_name = "llm_validation_endpoint"
-dev_endpoint_host = "https://xxx.x.azuredatabricks.net/"
-dev_endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
-
-prod_endpoint_name = "prd_llm_endpoint"
-prod_endpoint_host = "https://xxx.x.azuredatabricks.net/"
-prod_endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
-
-eval_dataset = "demo_prep.vector_search_data.eval_set_databricks_documentation"
+dev_endpoint_name = dbutils.widgets.get("dev_endpoint_name")
+dev_endpoint_host = dbutils.widgets.get("dev_endpoint_host")
+dev_endpoint_token = dbutils.widgets.get("dev_endpoint_token")
+prod_endpoint_name = dbutils.widgets.get("prod_endpoint_name")
+prod_endpoint_host = dbutils.widgets.get("prod_endpoint_host")
+prod_endpoint_token = dbutils.widgets.get("prod_endpoint_token")
+eval_dataset = dbutils.widgets.get("eval_dataset")
 
 # COMMAND ----------
 

@@ -1,12 +1,12 @@
 # Databricks notebook source
-host = "https://xxx.x.azuredatabricks.net"
-endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
-host_dependency = "https://xxx.x.azuredatabricks.net"
-endpoint_token_dependency = dbutils.secrets.get(scope="creds", key="pat_dependency")
-endpoint_name = "llm_validation_endpoint"
-tracking_table_catalog = "llmops_dev"
-tracking_table_schema = "model_tracking"
-tracking_table_name = "rag_app_realtime"
+host = dbutils.widgets.get("host")
+endpoint_token = dbutils.widgets.get("endpoint_token")
+host_dependency = dbutils.widgets.get("host_dependency")
+endpoint_token_dependency = dbutils.widgets.get("endpoint_token_dependency")
+endpoint_name = dbutils.widgets.get("endpoint_name")
+tracking_table_catalog = dbutils.widgets.get("tracking_table_catalog")
+tracking_table_schema = dbutils.widgets.get("tracking_table_schema")
+tracking_table_name = dbutils.widgets.get("tracking_table_name")
 
 # COMMAND ----------
 
