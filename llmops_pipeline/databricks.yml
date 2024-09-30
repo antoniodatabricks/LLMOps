@@ -26,8 +26,7 @@ resources:
             num_workers: 0
       tasks:
         - task_key: chain_model
-          #job_cluster_key: llm-cluster
-          existing_cluster_id: 0916-130040-1ns9zv2e
+          job_cluster_key: llm-cluster
           notebook_task:
             base_parameters:
               host: "https://adb-2332510266816567.7.azuredatabricks.net"
@@ -48,8 +47,7 @@ resources:
               final_model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model"
             notebook_path: src/Build RAG and register to UC.py
         - task_key: spin_up_endpoint
-          #job_cluster_key: llm-cluster
-          existing_cluster_id: 0916-130040-1ns9zv2e
+          job_cluster_key: llm-cluster
           depends_on:
             - task_key: chain_model
           notebook_task:
@@ -67,8 +65,7 @@ resources:
               tracking_table_name: ""
             notebook_path: src/Create Model Serving Endpoint.py
         - task_key: evaluate_model
-          #job_cluster_key: llm-cluster
-          existing_cluster_id: 0916-130040-1ns9zv2e
+          job_cluster_key: llm-cluster
           depends_on:
             - task_key: spin_up_endpoint
           notebook_task:
@@ -107,8 +104,7 @@ resources:
             num_workers: 0
       tasks:
         - task_key: promote_to_qa
-          #job_cluster_key: llm-cluster
-          existing_cluster_id: 0924-182604-w3jy9dri
+          job_cluster_key: llm-cluster
           notebook_task:
             base_parameters:
               source_model: "system.ai.meta_llama_v3_1_70b_instruct"
@@ -116,8 +112,7 @@ resources:
               target_model: ""
             notebook_path: src/Promote Model.py
         - task_key: chain_model
-          #job_cluster_key: llm-cluster
-          existing_cluster_id: 0924-182604-w3jy9dri
+          job_cluster_key: llm-cluster
           depends_on:
             - task_key: promote_to_qa
           notebook_task:
@@ -140,8 +135,7 @@ resources:
               final_model_name: "llmops_qa.model_schema.basic_rag_demo_foundation_model"
             notebook_path: src/Build RAG and register to UC.py
         - task_key: spin_up_endpoint
-          #job_cluster_key: llm-cluster
-          existing_cluster_id: 0924-182604-w3jy9dri
+          job_cluster_key: llm-cluster
           depends_on:
             - task_key: chain_model
           notebook_task:
@@ -182,8 +176,7 @@ resources:
             num_workers: 0
       tasks:
         - task_key: promote_to_prod
-          #job_cluster_key: llm-cluster
-          existing_cluster_id: 0930-192021-nccm69uq
+          job_cluster_key: llm-cluster
           notebook_task:
             base_parameters:
               source_model: "system.ai.meta_llama_v3_1_70b_instruct"
@@ -191,8 +184,7 @@ resources:
               target_model: ""
             notebook_path: src/Promote Model.py
         - task_key: chain_model
-          #job_cluster_key: llm-cluster
-          existing_cluster_id: 0930-192021-nccm69uq
+          job_cluster_key: llm-cluster
           depends_on:
             - task_key: promote_to_prod
           notebook_task:
@@ -215,8 +207,7 @@ resources:
               final_model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model"
             notebook_path: src/Build RAG and register to UC.py
         - task_key: spin_up_endpoint
-          #job_cluster_key: llm-cluster
-          existing_cluster_id: 0930-192021-nccm69uq
+          job_cluster_key: llm-cluster
           depends_on:
             - task_key: chain_model
           notebook_task:
