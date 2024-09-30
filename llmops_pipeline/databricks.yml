@@ -52,18 +52,17 @@ resources:
             - task_key: chain_model
           notebook_task:
             base_parameters:
-              base_parameters:
-                model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model"
-                endpoint_name: "llm_validation_endpoint"
-                endpoint_host: "https://adb-2332510266816567.7.azuredatabricks.net"
-                endpoint_token_scope: "creds"
-                endpoint_token_secret: "pat"
-                dependencies_host: "https://adb-2332510266816567.7.azuredatabricks.net"
-                dependencies_token_scope: "creds"
-                dependencies_token_secret: "pat"
-                tracking_table_catalog: ""
-                tracking_table_schema: ""
-                tracking_table_name: ""
+              model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model"
+              endpoint_name: "llm_validation_endpoint"
+              endpoint_host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              endpoint_token_scope: "creds"
+              endpoint_token_secret: "pat"
+              dependencies_host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              dependencies_token_scope: "creds"
+              dependencies_token_secret: "pat"
+              tracking_table_catalog: ""
+              tracking_table_schema: ""
+              tracking_table_name: ""
             notebook_path: src/Create Model Serving Endpoint.py
         - task_key: evaluate_model
           job_cluster_key: llm-cluster
@@ -141,18 +140,17 @@ resources:
             - task_key: chain_model
           notebook_task:
             base_parameters:
-              base_parameters:
-                model_name: "llmops_qa.model_schema.basic_rag_demo_foundation_model"
-                endpoint_name: "llm_validation_endpoint"
-                endpoint_host: "https://adb-2511663555363650.10.azuredatabricks.net"
-                endpoint_token_scope: "creds"
-                endpoint_token_secret: "pat"
-                dependencies_host: "https://adb-2332510266816567.7.azuredatabricks.net"
-                dependencies_token_scope: "creds"
-                dependencies_token_secret: "pat_dev"
-                tracking_table_catalog: ""
-                tracking_table_schema: ""
-                tracking_table_name: ""
+              model_name: "llmops_qa.model_schema.basic_rag_demo_foundation_model"
+              endpoint_name: "llm_validation_endpoint"
+              endpoint_host: "https://adb-2511663555363650.10.azuredatabricks.net"
+              endpoint_token_scope: "creds"
+              endpoint_token_secret: "pat"
+              dependencies_host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              dependencies_token_scope: "creds"
+              dependencies_token_secret: "pat_dev"
+              tracking_table_catalog: ""
+              tracking_table_schema: ""
+              tracking_table_name: ""
             notebook_path: src/Create Model Serving Endpoint.py
 
     deploy_to_prod:
@@ -214,18 +212,17 @@ resources:
             - task_key: chain_model
           notebook_task:
             base_parameters:
-              base_parameters:
-                model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model"
-                endpoint_name: "llm_validation_endpoint"
-                endpoint_host: "https://adb-2852242719721132.12.azuredatabricks.net"
-                endpoint_token_scope: "creds"
-                endpoint_token_secret: "pat"
-                dependencies_host: "https://adb-2332510266816567.7.azuredatabricks.net"
-                dependencies_token_scope: "creds"
-                dependencies_token_secret: "pat_dev"
-                tracking_table_catalog: "llmops_prod"
-                tracking_table_schema: "model_tracking"
-                tracking_table_name: "rag_app_realtime_payload"
+              model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model"
+              endpoint_name: "llm_validation_endpoint"
+              endpoint_host: "https://adb-2852242719721132.12.azuredatabricks.net"
+              endpoint_token_scope: "creds"
+              endpoint_token_secret: "pat"
+              dependencies_host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              dependencies_token_scope: "creds"
+              dependencies_token_secret: "pat_dev"
+              tracking_table_catalog: "llmops_prod"
+              tracking_table_schema: "model_tracking"
+              tracking_table_name: "rag_app_realtime_payload"
             notebook_path: src/Create Model Serving Endpoint.py
 
 targets:
