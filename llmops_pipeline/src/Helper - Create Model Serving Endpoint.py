@@ -39,13 +39,14 @@ endpoint_token = dbutils.widgets.get("endpoint_token")
 import mlflow
 from mlflow import MlflowClient
 
-# Point to UC registry
-mlflow.set_registry_uri("databricks-uc")
-
 def get_latest_model_version(model_name_in:str = None):
     """
     Get latest version of registered model
     """
+
+    # Point to UC registry
+    mlflow.set_registry_uri("databricks-uc")
+
     client = MlflowClient()
     model_version_infos = client.search_model_versions("name = '%s'" % model_name_in)
 
