@@ -4,10 +4,6 @@
 
 # COMMAND ----------
 
-dbutils.library.restartPython()
-
-# COMMAND ----------
-
 # MAGIC %pip install mlflow databricks-sdk evaluate rouge_score databricks-agents
 
 # COMMAND ----------
@@ -16,20 +12,31 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
+# MAGIC %run ./helper
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Parameters
 
 # COMMAND ----------
 
-dev_endpoint_name = "llm_validation_endpoint"
-dev_endpoint_host = "https://xxx.x.azuredatabricks.net/"
-dev_endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
+# Information about the endpoint that we are evaluating
+challenger_endpoint_name = dbutils.widgets.get("challenger_endpoint_name")
+challenger_endpoint_host = dbutils.widgets.get("challenger_endpoint_host")
+challenger_endpoint_token_scope = dbutils.widgets.get("challenger_endpoint_token_scope")
+challenger_endpoint_token_secret = dbutils.widgets.get("challenger_endpoint_token_secret")
+challenger_endpoint_token = dbutils.secrets.get(scope=challenger_endpoint_token_scope, key=challenger_endpoint_token_secret)
 
-prod_endpoint_name = "prd_llm_endpoint"
-prod_endpoint_host = "https://xxx.x.azuredatabricks.net/"
-prod_endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
+# Information about the endpoint currently in production
+champion_endpoint_name = dbutils.widgets.get("champion_endpoint_name")
+champion_endpoint_host = dbutils.widgets.get("champion_endpoint_host")
+champion_endpoint_token_scope = dbutils.widgets.get("champion_endpoint_token_scope")
+champion_endpoint_token_secret = dbutils.widgets.get("champion_endpoint_token_secret")
+champion_endpoint_token = dbutils.secrets.get(scope=champion_endpoint_token_scope, key=champion_endpoint_token_secret)
 
-eval_dataset = "demo_prep.vector_search_data.eval_set_databricks_documentation"
+# Evaludation dataset
+evaluation_dataset = dbutils.widgets.get("evaluation_dataset")
 
 # COMMAND ----------
 
@@ -38,38 +45,8 @@ eval_dataset = "demo_prep.vector_search_data.eval_set_databricks_documentation"
 
 # COMMAND ----------
 
-# DBTITLE 1,Score wrapper
-import requests
-import json
-
-def score_model(question, host, endpoint, token):
-
-    data = {
-        "messages": 
-            [ 
-             {
-                 "role": "user", 
-                 "content": question
-             }
-            ]
-           }
-
-    headers = {"Context-Type": "text/json", "Authorization": f"Bearer {token}"}
-
-    response = requests.post(
-        url=f"{host}/serving-endpoints/{endpoint}/invocations", json=data, headers=headers
-    )
-
-    if response.status_code != 200:
-        return ""
-    else:
-        return response.text
-
-# COMMAND ----------
-
 # DBTITLE 1,Evaluation dataset
-df_eval = spark.table(eval_dataset).limit(10)
-display(df_eval)
+df_eval = spark.table(evaluation_dataset).limit(10) # Selecting only 10 records for test purposes
 
 # COMMAND ----------
 
@@ -84,8 +61,8 @@ for row in df_eval.collect():
     question = row["request"]
     expected_answer = row["expected_response"]
 
-    answer_dev = score_model(question, dev_endpoint_host, dev_endpoint_name, dev_endpoint_token)
-    answer_prod = score_model(question, prod_endpoint_host, prod_endpoint_name, prod_endpoint_token)
+    answer_dev = score_model(question, challenger_endpoint_host, challenger_endpoint_name, challenger_endpoint_token)
+    answer_prod = score_model(question, champion_endpoint_host, champion_endpoint_name, champion_endpoint_token)
 
     dev_ds_for_eval.append({"request": f"{question}", "response": f"{answer_dev}", "retrieved_context": [], "expected_response": f"{expected_answer}"})
     prod_ds_for_eval.append({"request": f"{question}", "response": f"{answer_prod}", "retrieved_context": [], "expected_response": f"{expected_answer}"})
@@ -163,14 +140,6 @@ with mlflow.start_run() as run:
 
 # COMMAND ----------
 
-dev_results.metrics
-
-# COMMAND ----------
-
-prod_results.metrics
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC # Compare DEV metrics to PROD metrics
 
@@ -188,7 +157,3 @@ assert float(dev_results.metrics["rougeL/v1/p90"]) >= float(prod_results.metrics
 assert float(dev_results.metrics["rougeLsum/v1/mean"]) >= float(prod_results.metrics["rougeLsum/v1/mean"]), "rougeLsum/v1/mean is not greater than prod"
 assert float(dev_results.metrics["rougeLsum/v1/variance"]) >= float(prod_results.metrics["rougeLsum/v1/variance"]), "rougeLsum/v1/variance is not greater than prod"
 assert float(dev_results.metrics["rougeLsum/v1/p90"]) >= float(prod_results.metrics["rougeLsum/v1/p90"]), "rougeLsum/v1/p90 is not greater than prod"
-
-# COMMAND ----------
-
-
