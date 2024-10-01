@@ -4,10 +4,6 @@
 
 # COMMAND ----------
 
-dbutils.library.restartPython()
-
-# COMMAND ----------
-
 # MAGIC %pip install -U --quiet databricks-sdk mlflow textstat tiktoken evaluate
 
 # COMMAND ----------
@@ -21,72 +17,21 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
-endpoint_host = "https://xxx.x.azuredatabricks.net"
-endpoint_name = "llm_prod_endpoint"
-inference_table_name = "llmops_prod.model_tracking.rag_app_realtime_payload"
-inference_processed_table = "llmops_prod.model_tracking.rag_app_realtime_payload_processed"
-lakehouse_monitoring_schema = "llmops_prod.model_tracking"
+# Model Serving Endpoint details
+endpoint_url = dbutils.widgets.get("endpoint_url")
 endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
-working_dir = "/dbfs/tmp/llmops_prod/rag_app"
+
+# Inference table details
+inference_table_name = dbutils.widgets.get("inference_table_name")
+inference_processed_table = dbutils.widgets.get("inference_processed_table")
+
+# Streaming job details
+streaming_checkpoint_dir = dbutils.widgets.get("streaming_checkpoint_dir")
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Populate inference table
-
-# COMMAND ----------
-
-import requests
-import json
-
-def get_answer(question):
-
-    data = {
-        "messages": 
-            [ 
-             {
-                 "role": "user", 
-                 "content": question
-             }
-            ]
-           }
-
-    headers = {"Context-Type": "text/json", "Authorization": f"Bearer {endpoint_token}"}
-
-    response = requests.post(
-        url=f"{endpoint_host}/serving-endpoints/{endpoint_name}/invocations", json=data, headers=headers
-    )
-
-    return response.text
-
-# COMMAND ----------
-
-get_answer("How to start a cluster?")
-
-# COMMAND ----------
-
-get_answer("How to bake a cake?")
-
-# COMMAND ----------
-
-get_answer("How to create a notebook?")
-
-# COMMAND ----------
-
-get_answer("How to rob a bank?")
-
-# COMMAND ----------
-
-get_answer("How to see a job run?")
-
-# COMMAND ----------
-
-display(spark.table(inference_table_name))
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC # Unpack the table
+# MAGIC # Unpack Inference table
 
 # COMMAND ----------
 
@@ -135,19 +80,6 @@ def unpack_requests(requests_raw: DataFrame) -> DataFrame:
     requests_exploded = requests_unpacked.withColumnRenamed("request", "input").withColumnRenamed("response", "output").drop("request_metadata")
 
     return requests_exploded
-
-# COMMAND ----------
-
-payloads_sample_df = spark.table(inference_table_name).where('status_code == 200')
-
-# COMMAND ----------
-
-# Unpack using provided helper function
-payloads_unpacked_sample_df = unpack_requests(
-    payloads_sample_df
-)
-
-display(payloads_unpacked_sample_df)
 
 # COMMAND ----------
 
@@ -205,20 +137,6 @@ def compute_metrics(requests_df: DataFrame, column_to_measure = ["input", "outpu
 
 # COMMAND ----------
 
-requests_processed_df = unpack_requests(
-    payloads_sample_df
-)
-
-# Drop un-necessary columns for monitoring jobs
-requests_processed_df = requests_processed_df.drop("date", "status_code", "sampling_fraction", "client_request_id", "databricks_request_id")
-
-# Compute text evaluation metrics
-requests_with_metrics_df = compute_metrics(requests_processed_df)
-
-display(requests_with_metrics_df)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC # Incrementally unpack & compute metrics from payloads and save to final `_processed` table 
 
@@ -227,7 +145,7 @@ display(requests_with_metrics_df)
 import os
 
 # Reset checkpoint [for demo purposes ONLY]
-checkpoint_location = os.path.join(working_dir, "checkpoint")
+checkpoint_location = os.path.join(streaming_checkpoint_dir, "checkpoint")
 dbutils.fs.rm(checkpoint_location, True)
 
 # Unpack the requests as a stream.
@@ -273,53 +191,3 @@ create_processed_table_if_not_exists(processed_table_name, requests_with_metrics
                       .outputMode("append")
                       .option("checkpointLocation", checkpoint_location)
                       .toTable(processed_table_name).awaitTermination())
-
-# Display the table (with requests and text evaluation metrics) that will be monitored.
-display(spark.table(processed_table_name))
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC # Setup Lakehouse monitoring for the inference table metrics
-
-# COMMAND ----------
-
-from databricks.sdk import WorkspaceClient
-from databricks.sdk.service.catalog import MonitorTimeSeries
-
-# Create monitor using databricks-sdk's `quality_monitors` client
-w = WorkspaceClient()
-
-try:
-  lhm_monitor = w.quality_monitors.create(
-    table_name=processed_table_name, # Always use 3-level namespace
-    time_series = MonitorTimeSeries(
-      timestamp_col = "timestamp",
-      granularities = ["5 minutes"],
-    ),
-    assets_dir = os.getcwd(),
-    slicing_exprs = ["model_id"],
-    output_schema_name=f"{lakehouse_monitoring_schema}"
-  )
-
-except Exception as lhm_exception:
-  print(lhm_exception)
-
-# COMMAND ----------
-
-from databricks.sdk.service.catalog import MonitorInfoStatus
-
-monitor_info = w.quality_monitors.get(processed_table_name)
-print(monitor_info.status)
-
-if monitor_info.status == MonitorInfoStatus.MONITOR_STATUS_PENDING:
-    print("Wait until monitor creation is completed...")
-
-# COMMAND ----------
-
-monitor_info = w.quality_monitors.get(processed_table_name)
-assert monitor_info.status == MonitorInfoStatus.MONITOR_STATUS_ACTIVE, "Monitoring is not ready yet. Check back in a few minutes or view the monitoring creation process for any errors."
-
-# COMMAND ----------
-
-

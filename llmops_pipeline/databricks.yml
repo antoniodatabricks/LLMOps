@@ -3,8 +3,8 @@ bundle:
 
 resources:
   jobs:
-    chain_and_validate_rag:
-      name: chain_and_validate_rag
+    deploy_to_dev:
+      name: deploy_to_dev
       job_clusters:
         - job_cluster_key: llm-cluster
           new_cluster:
@@ -29,27 +29,54 @@ resources:
           job_cluster_key: llm-cluster
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
-            notebook_path: src/Step 1 - Deploy RAG to DEV.py
+              host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              token_scope: "creds"
+              token_secret: "pat"
+              foundation_endpoint_name: "meta_llama_v3_1_70b_instruct_endpoint"
+              model_uc: "system.ai.meta_llama_v3_1_70b_instruct"
+              model_uc_version: "2"
+              embedding_model_name: "databricks-gte-large-en"
+              vs_endpoint_name: "databricks_docs_vector_search"
+              vs_index_fullname: "demo_prep.vector_search_data.databricks_documentation_vs_index"
+              vs_host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              vs_token_scope: "creds"
+              vs_token_secret: "pat"
+              llma_guard_endpoint: "https://adb-2332510266816567.7.azuredatabricks.net/serving-endpoints/llamaguard/invocations"
+              llma_guard_endpoint_token_scope: "creds"
+              llma_guard_endpoint_token_secret: "pat"
+              final_model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model"
+            notebook_path: src/Build RAG and register to UC.py
         - task_key: spin_up_endpoint
           job_cluster_key: llm-cluster
           depends_on:
             - task_key: chain_model
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
-            notebook_path: src/Step 2 - Create Serving Endpoint DEV.py
+              model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model"
+              endpoint_name: "dev_llm_endpoint"
+              endpoint_host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              endpoint_token_scope: "creds"
+              endpoint_token_secret: "pat"
+              tracking_table_catalog: ""
+              tracking_table_schema: ""
+              tracking_table_name: ""
+            notebook_path: src/Create Model Serving Endpoint.py
         - task_key: evaluate_model
           job_cluster_key: llm-cluster
           depends_on:
             - task_key: spin_up_endpoint
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
-            notebook_path: src/Step 3 - Evaluate the model DEV.py
+              challenger_endpoint_name: "dev_llm_endpoint"
+              challenger_endpoint_host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              challenger_endpoint_token_scope: "creds"
+              challenger_endpoint_token_secret: "pat"
+              champion_endpoint_name: "prd_llm_endpoint"
+              champion_endpoint_host: "https://adb-2852242719721132.12.azuredatabricks.net"
+              champion_endpoint_token_scope: "creds"
+              champion_endpoint_token_secret: "pat_prod"
+              evaluation_dataset: "demo_prep.vector_search_data.eval_set_databricks_documentation"
+            notebook_path: src/Evaluate Model.py
 
     deploy_to_qa:
       name: deploy_to_qa
@@ -77,18 +104,48 @@ resources:
           job_cluster_key: llm-cluster
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
-            notebook_path: src/Step 4 - Promote model to QA.py
-        - task_key: spin_up_endpoint
+              source_model: "system.ai.meta_llama_v3_1_70b_instruct"
+              source_model_version: "2"
+              target_model: ""
+            notebook_path: src/Promote Model.py
+        - task_key: chain_model
           job_cluster_key: llm-cluster
           depends_on:
             - task_key: promote_to_qa
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
-            notebook_path: src/Step 5 - Create Serving Endpoint QA.py
+              host: "https://adb-2511663555363650.10.azuredatabricks.net"
+              token_scope: "creds"
+              token_secret: "pat"
+              foundation_endpoint_name: "meta_llama_v3_1_70b_instruct_endpoint"
+              model_uc: "system.ai.meta_llama_v3_1_70b_instruct"
+              model_uc_version: "2"
+              embedding_model_name: "databricks-gte-large-en"
+              vs_endpoint_name: "databricks_docs_vector_search"
+              vs_index_fullname: "demo_prep.vector_search_data.databricks_documentation_vs_index"
+              vs_host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              vs_token_scope: "creds"
+              vs_token_secret: "pat_dev"
+              llma_guard_endpoint: "https://adb-2332510266816567.7.azuredatabricks.net/serving-endpoints/llamaguard/invocations"
+              llma_guard_endpoint_token_scope: "creds"
+              llma_guard_endpoint_token_secret: "pat_dev"
+              final_model_name: "llmops_qa.model_schema.basic_rag_demo_foundation_model"
+            notebook_path: src/Build RAG and register to UC.py
+        - task_key: spin_up_endpoint
+          job_cluster_key: llm-cluster
+          depends_on:
+            - task_key: chain_model
+          notebook_task:
+            base_parameters:
+              model_name: "llmops_qa.model_schema.basic_rag_demo_foundation_model"
+              endpoint_name: "qa_llm_endpoint"
+              endpoint_host: "https://adb-2511663555363650.10.azuredatabricks.net"
+              endpoint_token_scope: "creds"
+              endpoint_token_secret: "pat"
+              tracking_table_catalog: ""
+              tracking_table_schema: ""
+              tracking_table_name: ""
+            notebook_path: src/Create Model Serving Endpoint.py
 
     deploy_to_prod:
       name: deploy_to_prod
@@ -116,26 +173,107 @@ resources:
           job_cluster_key: llm-cluster
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
-            notebook_path: src/Step 6 - Promote model to PROD.py
-        - task_key: spin_up_endpoint
+              source_model: "system.ai.meta_llama_v3_1_70b_instruct"
+              source_model_version: "2"
+              target_model: ""
+            notebook_path: src/Promote Model.py
+        - task_key: chain_model
           job_cluster_key: llm-cluster
           depends_on:
             - task_key: promote_to_prod
           notebook_task:
             base_parameters:
-              par1: "xxx"
-              par2: "xxx"
-            notebook_path: src/Step 7 - Create Serving Endpoint PROD.py
+              host: "https://adb-2852242719721132.12.azuredatabricks.net"
+              token_scope: "creds"
+              token_secret: "pat"
+              foundation_endpoint_name: "meta_llama_v3_1_70b_instruct_endpoint"
+              model_uc: "system.ai.meta_llama_v3_1_70b_instruct"
+              model_uc_version: "2"
+              embedding_model_name: "databricks-gte-large-en"
+              vs_endpoint_name: "databricks_docs_vector_search"
+              vs_index_fullname: "demo_prep.vector_search_data.databricks_documentation_vs_index"
+              vs_host: "https://adb-2332510266816567.7.azuredatabricks.net"
+              vs_token_scope: "creds"
+              vs_token_secret: "pat_dev"
+              llma_guard_endpoint: "https://adb-2332510266816567.7.azuredatabricks.net/serving-endpoints/llamaguard/invocations"
+              llma_guard_endpoint_token_scope: "creds"
+              llma_guard_endpoint_token_secret: "pat_dev"
+              final_model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model"
+            notebook_path: src/Build RAG and register to UC.py
+        - task_key: spin_up_endpoint
+          job_cluster_key: llm-cluster
+          depends_on:
+            - task_key: chain_model
+          notebook_task:
+            base_parameters:
+              model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model"
+              endpoint_name: "prod_llm_endpoint"
+              endpoint_host: "https://adb-2852242719721132.12.azuredatabricks.net"
+              endpoint_token_scope: "creds"
+              endpoint_token_secret: "pat"
+              tracking_table_catalog: "llmops_prod"
+              tracking_table_schema: "model_tracking"
+              tracking_table_name: "rag_app_realtime"
+            notebook_path: src/Create Model Serving Endpoint.py
+        - task_key: setup_Lakehouse_moniotoring
+          job_cluster_key: llm-cluster
+          depends_on:
+            - task_key: spin_up_endpoint
+          notebook_task:
+            base_parameters:
+              inference_processed_table: "llmops_prod.model_tracking.rag_app_realtime_payload_processed"
+              lakehouse_monitoring_schema: "llmops_prod.model_tracking"
+            notebook_path: src/Setup Lakehouse Monitoring.py
+        - task_key: setup_human_evaluation_app
+          job_cluster_key: llm-cluster
+          depends_on:
+            - task_key: setup_Lakehouse_moniotoring
+          notebook_task:
+            base_parameters:
+              model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model"
+              host: "https://adb-2852242719721132.12.azuredatabricks.net"
+            notebook_path: src/Create human evaluation app.py
+
+    compute_metrics_monitoring_prod:
+      name: compute_metrics_monitoring_prod
+      job_clusters:
+        - job_cluster_key: llm-cluster
+          new_cluster:
+            spark_version: 14.3.x-cpu-ml-scala2.12
+            spark_conf:
+              spark.master: local[*, 4]
+              spark.databricks.cluster.profile: singleNode
+            azure_attributes:
+              first_on_demand: 1
+              availability: ON_DEMAND_AZURE
+              spot_bid_max_price: -1
+            node_type_id: Standard_E4d_v4
+            driver_node_type_id: Standard_E4d_v4
+            custom_tags:
+              ResourceClass: SingleNode
+            enable_elastic_disk: true
+            data_security_mode: SINGLE_USER
+            runtime_engine: STANDARD
+            num_workers: 0
+      tasks:
+        - task_key: compute_metrics_monitoring
+          job_cluster_key: llm-cluster
+          notebook_task:
+            base_parameters:
+              endpoint_url: "https://adb-2852242719721132.12.azuredatabricks.net/serving-endpoints/prod_llm_endpoint/invocations"
+              inference_table_name: "llmops_prod.model_tracking.rag_app_realtime_payload"
+              inference_processed_table: "llmops_prod.model_tracking.rag_app_realtime_payload_processed"
+              streaming_checkpoint_dir: "/dbfs/tmp/llmops_prod/rag_app"
+            notebook_path: src/Compute Inference Table Metrics.py
+          job_cluster_key: llm-cluster
 
 targets:
   development:
     workspace:
-      host: https://xxx.x.azuredatabricks.net/
+      host: https://adb-2332510266816567.7.azuredatabricks.net/
   qa:
     workspace:
-      host: https://xxx.x.azuredatabricks.net/
+      host: https://adb-2511663555363650.10.azuredatabricks.net/
   prod:
     workspace:
-      host: https://xxx.x.azuredatabricks.net/
+      host: https://adb-2852242719721132.12.azuredatabricks.net/
