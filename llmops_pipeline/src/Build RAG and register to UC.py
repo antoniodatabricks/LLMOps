@@ -306,7 +306,3 @@ with mlflow.start_run(run_name="basic_rag_bot"):
         ],
         signature=signature
       )
-
-# COMMAND ----------
-
-
