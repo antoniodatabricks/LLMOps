@@ -16,6 +16,11 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC # Parameters
+
+# COMMAND ----------
+
 # Endpoint details
 model_name = dbutils.widgets.get("model_name")
 model_version = get_latest_model_version(model_name)
