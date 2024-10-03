@@ -17,10 +17,6 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
-# Model Serving Endpoint details
-endpoint_url = dbutils.widgets.get("endpoint_url")
-endpoint_token = dbutils.secrets.get(scope="creds", key="pat")
-
 # Inference table details
 inference_table_name = dbutils.widgets.get("inference_table_name")
 inference_processed_table = dbutils.widgets.get("inference_processed_table")
