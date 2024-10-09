@@ -3,79 +3,109 @@ bundle:
 
 resources:
   jobs:
-    deploy_to_dev: # Workflow that deploys the LLM Model to the Development Environment
-      name: deploy_to_dev # Workflow's name
+    deploy_to_dev:
+      name: deploy_to_dev
       tasks:
-        - task_key: IS_RAG
-          condition_task:
-            op: EQUAL_TO
-            left: "{{job.parameters.is_rag}}"
-            right: "true"
-        - task_key: chain_model # Workflow task that chains the LLM model in a RAG
-          depends_on:
-            - task_key: IS_RAG
-              outcome: "true"
+        - task_key: promote_to_dev
           notebook_task:
-            base_parameters:
-              host: "https://adb-3518217342349989.9.azuredatabricks.net" # Development environment URL (to be used during REST API calls)
-              token_scope: "creds" # Databricks secret scope storing credentials
-              token_secret: "pat" # Databricks secret containing a PAT for the Development environment
-              foundation_endpoint_name: "meta_llama_v3_1_70b_instruct_endpoint" # Name of the model serving endpoint for the foundation model
-              model_uc: "system.ai.meta_llama_v3_1_70b_instruct" # Model in UC to be deployed
-              model_uc_version: "2" # Model version to be deployed
-              embedding_model_name: "databricks-gte-large-en" # Embedding model to be used during context retrieval. This model has to be the same one used while populating the vector search index
-              vs_endpoint_name: "databricks_docs_vector_search" # Vector Search Endpoint name for RAG
-              vs_index_fullname: "demo_prep.vector_search_data.databricks_documentation_vs_index" # Vector Search Index name for RAG
-              vs_host: "https://adb-3518217342349989.9.azuredatabricks.net" # Environment where the Vector Search Endpoint is hosted
-              vs_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the Vector Search Endpoint is hosted
-              vs_token_secret: "pat" # Databricks secret containing a PAT for the environment where the Vector Search Endpoint is hosted
-              llma_guard_endpoint: "https://adb-3518217342349989.9.azuredatabricks.net/serving-endpoints/llamaguard/invocations" # Llammaguard endpoint URL for RAG
-              llma_guard_endpoint_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the Llammaguard endpoint URL is hosted
-              llma_guard_endpoint_token_secret: "pat" # Databricks ssecret containing a PAT for the environment where the Llammaguard endpoint URL is hosted
-              final_model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model" # RAG model name that will be created in the DEV catalog
-            notebook_path: src/Build RAG and register to UC.py # Notebook containing the source code for this task
-        - task_key: register_to_uc_dev
-          depends_on:
-            - task_key: IS_RAG
-              outcome: "false"
-          notebook_task:
+            notebook_path: /Repos/LLMOps/LLMOps/llmops_pipeline/src/Promote Model
             base_parameters:
               source_model: ""
               source_model_version: ""
               target_model: ""
-            notebook_path: /Repos/LLMOps/LLMOps/llmops_pipeline/src/Promote Model
             source: WORKSPACE
-        - task_key: spin_up_endpoint # Workflow task that spins up a model serving endpoint for the model created in the previus task
+          job_cluster_key: llm-cluster
+        - task_key: IS_RAG
+          depends_on:
+            - task_key: promote_to_dev
+          condition_task:
+            op: EQUAL_TO
+            left: "{{job.parameters.is_rag}}"
+            right: "true"
+        - task_key: chain_model
+          depends_on:
+            - task_key: IS_RAG
+              outcome: "true"
+          notebook_task:
+            notebook_path: /Workspace/Users/antonio.pinheirofilho@databricks.com/.bundle/llmops_pipeline/development/files/src/Build
+              RAG and register to UC
+            base_parameters:
+              vs_host: https://adb-3518217342349989.9.azuredatabricks.net
+              llma_guard_endpoint_token_scope: creds
+              foundation_endpoint_name: meta_llama_v3_1_70b_instruct_endpoint
+              model_uc_version: "2"
+              host: https://adb-3518217342349989.9.azuredatabricks.net
+              vs_token_secret: pat
+              llma_guard_endpoint_token_secret: pat
+              model_uc: system.ai.meta_llama_v3_1_70b_instruct
+              token_secret: pat
+              final_model_name: llmops_dev.model_schema.basic_rag_demo_foundation_model
+              llma_guard_endpoint: https://adb-3518217342349989.9.azuredatabricks.net/serving-endpoints/llamaguard/invocations
+              vs_endpoint_name: databricks_docs_vector_search
+              token_scope: creds
+              embedding_model_name: databricks-gte-large-en
+              vs_token_scope: creds
+              vs_index_fullname: demo_prep.vector_search_data.databricks_documentation_vs_index
+            source: WORKSPACE
+          job_cluster_key: llm-cluster
+        - task_key: spin_up_endpoint
           depends_on:
             - task_key: chain_model
-            - task_key: register_to_uc_dev
+            - task_key: IS_RAG
+              outcome: "false"
           run_if: AT_LEAST_ONE_SUCCESS
           notebook_task:
+            notebook_path: /Workspace/Users/antonio.pinheirofilho@databricks.com/.bundle/llmops_pipeline/development/files/src/Create
+              Model Serving Endpoint
             base_parameters:
-              model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model" # Name of the model created in the previous task
-              endpoint_name: "dev_llm_endpoint" # Name of the model serving endpoint that will be created
-              endpoint_host: "https://adb-3518217342349989.9.azuredatabricks.net" # Model Serving endpoint environment
-              endpoint_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the  Model Serving endpoint is hosted
-              endpoint_token_secret: "pat" # Databricks secret containing a PAT for the environment where the Model Serving endpoint is hosted
-              tracking_table_catalog: "" # Model Serving Endpoint Inference Table Catalog. Leave it empty if you don't wish to create inference tables for this endpoint
-              tracking_table_schema: "" # Model Serving Endpoint Inference Table Schema
-              tracking_table_name: "" # Model Serving Endpoint Inference Table
-            notebook_path: src/Create Model Serving Endpoint.py # Notebook containing the source code for this task
-        - task_key: evaluate_model # Workflow task that evaluate the model
+              tracking_table_schema: ""
+              tracking_table_catalog: ""
+              endpoint_token_secret: pat
+              tracking_table_name: ""
+              model_name: llmops_dev.model_schema.basic_rag_demo_foundation_model
+              endpoint_token_scope: creds
+              endpoint_host: https://adb-3518217342349989.9.azuredatabricks.net
+              endpoint_name: dev_llm_endpoint
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: evaluate_model
           depends_on:
             - task_key: spin_up_endpoint
           notebook_task:
+            notebook_path: /Workspace/Users/antonio.pinheirofilho@databricks.com/.bundle/llmops_pipeline/development/files/src/Evaluate
+              Model
             base_parameters:
-              challenger_endpoint_name: "dev_llm_endpoint" # Endpoint to be evaluated
-              challenger_endpoint_host: "https://adb-3518217342349989.9.azuredatabricks.net" # Environment where the Endpoint to be evaluated is hosted
-              challenger_endpoint_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the Endpoint to be evaludated is hosted
-              challenger_endpoint_token_secret: "pat" # Databricks secret containing a PAT for the environment where the Endpoint to be evaludated is hosted
-              champion_endpoint_name: "prd_llm_endpoint" # Endpoint to serve as baseline for evaluation (Endpoint already in PROD)
-              champion_endpoint_host: "https://adb-3518217342349989.9.azuredatabricks.net" # Environment where the PROD endpoint is hosted
-              champion_endpoint_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the PROD Endpoint is hosted
-              champion_endpoint_token_secret: "pat_prod" # Databricks secret containing a PAT for the environment where the PROD Endpoint is hosted
-              evaluation_dataset: "demo_prep.vector_search_data.eval_set_databricks_documentation" # Question and answer evaluation dataset
-            notebook_path: src/Evaluate Model.py # Notebook containing the source code for this task
+              challenger_endpoint_token_secret: pat
+              challenger_endpoint_host: https://adb-3518217342349989.9.azuredatabricks.net
+              evaluation_dataset: demo_prep.vector_search_data.eval_set_databricks_documentation
+              challenger_endpoint_name: dev_llm_endpoint
+              champion_endpoint_token_scope: creds
+              challenger_endpoint_token_scope: creds
+              champion_endpoint_name: prd_llm_endpoint
+              champion_endpoint_host: https://adb-3518217342349989.9.azuredatabricks.net
+              champion_endpoint_token_secret: pat_prod
+            source: WORKSPACE
+          job_cluster_key: llm-cluster
+      job_clusters:
+        - job_cluster_key: llm-cluster
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            spark_conf:
+              spark.master: local[*, 4]
+              spark.databricks.cluster.profile: singleNode
+            azure_attributes:
+              first_on_demand: 1
+              availability: ON_DEMAND_AZURE
+              spot_bid_max_price: -1
+            node_type_id: Standard_D4ds_v5
+            custom_tags:
+              ResourceClass: SingleNode
+            spark_env_vars:
+              PYSPARK_PYTHON: /databricks/python3/bin/python3
+            enable_elastic_disk: true
+            data_security_mode: SINGLE_USER
+            runtime_engine: STANDARD
+            num_workers: 0
       queue:
         enabled: true
       parameters:
@@ -112,10 +142,18 @@ resources:
               source_model_version: "2" # Version of the Model to be promoted from DEV to QA
               target_model: "" # Name of the Model in QA. Leave it empty is the model is not meant to move to another environment. For example, models in the catalog system.ai, which are meant to be shared
             notebook_path: src/Promote Model.py # Notebook containing the source code for this task
+        - task_key: IS_RAG
+          depends_on:
+            - task_key: promote_to_qa
+          condition_task:
+            op: EQUAL_TO
+            left: "{{job.parameters.is_rag}}"
+            right: "true"
         - task_key: chain_model # Workflow task that chains the LLM model in a RAG
           job_cluster_key: llm-cluster
           depends_on:
-            - task_key: promote_to_qa
+            - task_key: IS_RAG
+              outcome: "true"
           notebook_task:
             base_parameters:
               host: "https://adb-2511663555363650.10.azuredatabricks.net" # QA environment URL (to be used during REST API calls)
@@ -139,6 +177,9 @@ resources:
           job_cluster_key: llm-cluster
           depends_on:
             - task_key: chain_model
+            - task_key: IS_RAG
+              outcome: "false"
+          run_if: AT_LEAST_ONE_SUCCESS
           notebook_task:
             base_parameters:
               model_name: "llmops_qa.model_schema.basic_rag_demo_foundation_model" # Name of the model created in the previous task
@@ -181,10 +222,17 @@ resources:
               source_model_version: "2" # Version of the Model to be promoted from DEV to PROD
               target_model: "" # Name of the Model in QA. Leave it empty is the model is not meant to move to another environment. For example, models in the catalog system.ai, which are meant to be shared
             notebook_path: src/Promote Model.py
-        - task_key: chain_model # Workflow task that chains the LLM model in a RAG
-          job_cluster_key: llm-cluster
+        - task_key: IS_RAG
           depends_on:
-            - task_key: promote_to_prod
+            - task_key: promote_to_dev
+          condition_task:
+            op: EQUAL_TO
+            left: "{{job.parameters.is_rag}}"
+            right: "true"
+        - task_key: chain_model
+          depends_on:
+            - task_key: IS_RAG
+              outcome: "true"
           notebook_task:
             base_parameters:
               host: "https://adb-2852242719721132.12.azuredatabricks.net" # PROD environment URL (to be used during REST API calls)
@@ -208,6 +256,9 @@ resources:
           job_cluster_key: llm-cluster
           depends_on:
             - task_key: chain_model
+            - task_key: IS_RAG
+              outcome: "false"
+          run_if: AT_LEAST_ONE_SUCCESS
           notebook_task:
             base_parameters:
               model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model" # Name of the model created in the previous task
