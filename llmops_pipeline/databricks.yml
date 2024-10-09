@@ -25,8 +25,16 @@ resources:
             runtime_engine: STANDARD
             num_workers: 0
       tasks:
+        - task_key: IS_RAG
+          condition_task:
+            op: EQUAL_TO
+            left: "{{job.parameters.is_rag}}"
+            right: "true"
         - task_key: chain_model # Workflow task that chains the LLM model in a RAG
           job_cluster_key: llm-cluster # Job cluster that this task will use
+          depends_on:
+            - task_key: IS_RAG
+              outcome: "true"
           notebook_task:
             base_parameters:
               host: "https://adb-2332510266816567.7.azuredatabricks.net" # Development environment URL (to be used during REST API calls)
@@ -46,10 +54,23 @@ resources:
               llma_guard_endpoint_token_secret: "pat" # Databricks ssecret containing a PAT for the environment where the Llammaguard endpoint URL is hosted
               final_model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model" # RAG model name that will be created in the DEV catalog
             notebook_path: src/Build RAG and register to UC.py # Notebook containing the source code for this task
+        - task_key: register_to_uc_dev
+          depends_on:
+            - task_key: IS_RAG
+              outcome: "false"
+          notebook_task:
+            base_parameters:
+              source_model: ""
+              source_model_version: ""
+              target_model: ""
+            notebook_path: /Repos/LLMOps/LLMOps/llmops_pipeline/src/Promote Model
+            source: WORKSPACE
         - task_key: spin_up_endpoint # Workflow task that spins up a model serving endpoint for the model created in the previus task
           job_cluster_key: llm-cluster # Job cluster that this task will use
           depends_on:
             - task_key: chain_model
+            - task_key: register_to_uc_dev
+          run_if: AT_LEAST_ONE_SUCCESS
           notebook_task:
             base_parameters:
               model_name: "llmops_dev.model_schema.basic_rag_demo_foundation_model" # Name of the model created in the previous task
@@ -77,6 +98,11 @@ resources:
               champion_endpoint_token_secret: "pat_prod" # Databricks secret containing a PAT for the environment where the PROD Endpoint is hosted
               evaluation_dataset: "demo_prep.vector_search_data.eval_set_databricks_documentation" # Question and answer evaluation dataset
             notebook_path: src/Evaluate Model.py # Notebook containing the source code for this task
+      queue:
+        enabled: true
+      parameters:
+        - name: is_rag
+          default: "true"
 
     deploy_to_qa:  # Workflow that deploys the LLM Model to the QA Environment
       name: deploy_to_qa
