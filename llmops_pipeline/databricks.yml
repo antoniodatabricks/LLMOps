@@ -224,7 +224,7 @@ resources:
             notebook_path: src/Promote Model.py
         - task_key: IS_RAG
           depends_on:
-            - task_key: promote_to_dev
+            - task_key: deploy_to_prod
           condition_task:
             op: EQUAL_TO
             left: "{{job.parameters.is_rag}}"
