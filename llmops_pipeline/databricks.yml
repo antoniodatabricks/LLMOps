@@ -5,25 +5,6 @@ resources:
   jobs:
     deploy_to_dev: # Workflow that deploys the LLM Model to the Development Environment
       name: deploy_to_dev # Workflow's name
-      job_clusters: # Job cluster definition. This cluster will be used by the Workflow tasks and it can be a small one, since there are no heavy processes taking place
-        - job_cluster_key: llm-cluster
-          new_cluster:
-            spark_version: 14.3.x-cpu-ml-scala2.12
-            spark_conf:
-              spark.master: local[*, 4]
-              spark.databricks.cluster.profile: singleNode
-            azure_attributes:
-              first_on_demand: 1
-              availability: ON_DEMAND_AZURE
-              spot_bid_max_price: -1
-            node_type_id: Standard_E4d_v4
-            driver_node_type_id: Standard_E4d_v4
-            custom_tags:
-              ResourceClass: SingleNode
-            enable_elastic_disk: true
-            data_security_mode: SINGLE_USER
-            runtime_engine: STANDARD
-            num_workers: 0
       tasks:
         - task_key: IS_RAG
           condition_task:
@@ -31,7 +12,6 @@ resources:
             left: "{{job.parameters.is_rag}}"
             right: "true"
         - task_key: chain_model # Workflow task that chains the LLM model in a RAG
-          job_cluster_key: llm-cluster # Job cluster that this task will use
           depends_on:
             - task_key: IS_RAG
               outcome: "true"
@@ -66,7 +46,6 @@ resources:
             notebook_path: /Repos/LLMOps/LLMOps/llmops_pipeline/src/Promote Model
             source: WORKSPACE
         - task_key: spin_up_endpoint # Workflow task that spins up a model serving endpoint for the model created in the previus task
-          job_cluster_key: llm-cluster # Job cluster that this task will use
           depends_on:
             - task_key: chain_model
             - task_key: register_to_uc_dev
@@ -83,7 +62,6 @@ resources:
               tracking_table_name: "" # Model Serving Endpoint Inference Table
             notebook_path: src/Create Model Serving Endpoint.py # Notebook containing the source code for this task
         - task_key: evaluate_model # Workflow task that evaluate the model
-          job_cluster_key: llm-cluster # Job cluster that this task will use
           depends_on:
             - task_key: spin_up_endpoint
           notebook_task:
