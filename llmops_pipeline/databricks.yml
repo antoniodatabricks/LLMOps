@@ -191,6 +191,11 @@ resources:
               tracking_table_schema: "" # Model Serving Endpoint Inference Table Schema
               tracking_table_name: "" # Model Serving Endpoint Inference Table
             notebook_path: src/Create Model Serving Endpoint.py # Notebook containing the source code for this task
+      queue:
+        enabled: true
+      parameters:
+        - name: is_rag
+          default: "true"
 
     deploy_to_prod:  # Workflow that deploys the LLM Model to the PROD Environment
       name: deploy_to_prod
@@ -288,6 +293,11 @@ resources:
               model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model" # Model name that the evaludation app will use
               host: "https://adb-2852242719721132.12.azuredatabricks.net" # Environment where the evaluation app will be hosted
             notebook_path: src/Create human evaluation app.py
+      queue:
+        enabled: true
+      parameters:
+        - name: is_rag
+          default: "true"
 
     compute_metrics_monitoring_prod: # Workflow that calculate metrics to be used by the lakehouse monitoring
       name: compute_metrics_monitoring_prod
