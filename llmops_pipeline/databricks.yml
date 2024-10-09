@@ -67,7 +67,7 @@ resources:
               endpoint_host: https://adb-3518217342349989.9.azuredatabricks.net
               endpoint_name: dev_llm_endpoint
             source: WORKSPACE
-          job_cluster_key: Job_cluster
+          job_cluster_key: llm-cluster
         - task_key: evaluate_model
           depends_on:
             - task_key: spin_up_endpoint
