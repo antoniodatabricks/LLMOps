@@ -17,13 +17,18 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
-databricks_docs_table = "demo_prep.vector_search_data.databricks_documentation"
-databricks_docs_table_eval = "demo_prep.vector_search_data.eval_set_databricks_documentation"
+databricks_docs_catalog = "demo_prep"
+databricks_docs_schema = "vector_search_data"
+databricks_docs_table = f"{databricks_docs_catalog}.{databricks_docs_schema}.databricks_documentation"
+databricks_docs_table_eval = f"{databricks_docs_catalog}.{databricks_docs_schema}.eval_set_databricks_documentation"
 VECTOR_SEARCH_ENDPOINT_NAME = "databricks_docs_vector_search"
 
 # COMMAND ----------
 
 import pandas as pd
+
+spark.sql(f"CREATE CATALOG IF NOT EXISTS {databricks_docs_catalog}")
+spark.sql(f"CREATE SCHEMA IF NOT EXISTS {databricks_docs_catalog}.{databricks_docs_schema}")
 
 if not spark.catalog.tableExists("databricks_documentation") or spark.table("databricks_documentation").isEmpty() or \
     not spark.catalog.tableExists("eval_set_databricks_documentation") or spark.table("eval_set_databricks_documentation").isEmpty():
@@ -172,7 +177,3 @@ results = vsc.get_index(VECTOR_SEARCH_ENDPOINT_NAME, vs_index_fullname).similari
   num_results=1)
 docs = results.get('result', {}).get('data_array', [])
 docs
-
-# COMMAND ----------
-
-
