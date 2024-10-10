@@ -26,13 +26,13 @@ target_model = dbutils.widgets.get("target_model")
 # MAGIC %md
 # MAGIC # Promote Model
 # MAGIC
-# MAGIC This step will only be executed if the target model name is provided and the model is not within "system.ai"
+# MAGIC This step will only be executed if the target model name is different from the source model name and the model is not within "system.ai"
 
 # COMMAND ----------
 
 import mlflow
 
-if target_model != "" and not source_model.startswith("system.ai"):
+if target_model != source_model and not source_model.startswith("system.ai"):
     copied_model_version = mlflow.register_model(
         model_uri = f"models:/{source_model}/{source_model_version}",
         name = target_model

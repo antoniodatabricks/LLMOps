@@ -74,6 +74,7 @@ pd_prod_data = pd.DataFrame(prod_ds_for_eval)
 
 # MAGIC %md
 # MAGIC # Example: Databricks Mosaic Agent (LLM as a judge)
+# MAGIC - https://docs.databricks.com/en/generative-ai/agent-evaluation/evaluate-agent.html
 
 # COMMAND ----------
 
@@ -88,6 +89,7 @@ display(result.tables['eval_results'])
 
 # MAGIC %md
 # MAGIC # Example: MLflow evaluators (LLM as a judge)
+# MAGIC - https://mlflow.org/docs/latest/llms/llm-evaluate/notebooks/question-answering-evaluation.html#Basic-Question-Answering-Evaluation
 
 # COMMAND ----------
 
@@ -113,6 +115,7 @@ with mlflow.start_run() as run:
 
 # MAGIC %md
 # MAGIC # Evaludate the model in DEV and PROD
+# MAGIC - https://docs.databricks.com/en/mlflow/llm-evaluate.html#select-metrics-to-evaluate-your-llm
 
 # COMMAND ----------
 
@@ -128,6 +131,11 @@ with mlflow.start_run() as run:
 
 # COMMAND ----------
 
+print("Challenger model metrics:")
+print(dev_results.metrics)
+
+# COMMAND ----------
+
 with mlflow.start_run() as run:
     prod_results = mlflow.evaluate(
         data=pd_prod_data_mlflow,
@@ -137,6 +145,11 @@ with mlflow.start_run() as run:
     )
     
     prod_results.tables["eval_results_table"].display()
+
+# COMMAND ----------
+
+print("Champion model metrics:")
+print(prod_results.metrics)
 
 # COMMAND ----------
 
