@@ -128,6 +128,11 @@ with mlflow.start_run() as run:
 
 # COMMAND ----------
 
+print("Challenger model metrics:")
+print(dev_results.metrics)
+
+# COMMAND ----------
+
 with mlflow.start_run() as run:
     prod_results = mlflow.evaluate(
         data=pd_prod_data_mlflow,
@@ -137,6 +142,11 @@ with mlflow.start_run() as run:
     )
     
     prod_results.tables["eval_results_table"].display()
+
+# COMMAND ----------
+
+print("Champion model metrics:")
+print(prod_results.metrics)
 
 # COMMAND ----------
 
