@@ -156,7 +156,7 @@ resources:
               outcome: "true"
           notebook_task:
             base_parameters:
-              host: "https://adb-2511663555363650.10.azuredatabricks.net" # QA environment URL (to be used during REST API calls)
+              host: "https://adb-2332510266816567.7.azuredatabricks.net" # QA environment URL (to be used during REST API calls)
               token_scope: "creds"  # Databricks secret scope storing credentials
               token_secret: "pat" # Databricks secret containing a PAT for the QA environment
               foundation_endpoint_name: "meta_llama_v3_1_70b_instruct_endpoint"  # Name of the model serving endpoint for the foundation model in the QA environment
@@ -184,7 +184,7 @@ resources:
             base_parameters:
               model_name: "llmops_qa.model_schema.basic_rag_demo_foundation_model" # Name of the model created in the previous task
               endpoint_name: "qa_llm_endpoint" # Name of the model serving endpoint that will be created in the QA environment
-              endpoint_host: "https://adb-2511663555363650.10.azuredatabricks.net" # Model Serving endpoint environment
+              endpoint_host: "https://adb-2332510266816567.7.azuredatabricks.net" # Model Serving endpoint environment
               endpoint_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the  Model Serving endpoint is hosted
               endpoint_token_secret: "pat" # Databricks secret containing a PAT for the environment where the Model Serving endpoint is hosted
               tracking_table_catalog: "" # Model Serving Endpoint Inference Table Catalog. Leave it empty if you don't wish to create inference tables for this endpoint
