@@ -2,6 +2,8 @@
 import mlflow
 from mlflow import MlflowClient
 from databricks.sdk import WorkspaceClient
+from databricks.sdk.service.workspace import WorkspaceObjectAccessControlRequest, WorkspaceObjectPermissionLevel
+from databricks.sdk.service.serving import ServingEndpointAccessControlRequest, ServingEndpointPermissionLevel
 import requests
 import json
 import re
@@ -24,6 +26,14 @@ def get_latest_model_version(model_name_in:str = None):
 
 # COMMAND ----------
 
+class Tag:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+    def as_dict(self):
+        return {'key': self.key, 'value': self.value}
+    
 def deploy_model_serving_endpoint(endpoint_name, endpoint_config, host):
     
     # Initiate the workspace client
@@ -38,8 +48,21 @@ def deploy_model_serving_endpoint(endpoint_name, endpoint_config, host):
 
     # If endpoint doesn't exist, create it
     if existing_endpoint == None:
+
+        # TODO: Tags be parameterized
+        tags = [Tag("team", "data science")]
         print(f"Creating the endpoint {serving_endpoint_url}, this will take a few minutes to package and deploy the endpoint...")
-        w.serving_endpoints.create_and_wait(name=endpoint_name, config=endpoint_config)
+        w.serving_endpoints.create_and_wait(name=endpoint_name, config=endpoint_config, tags = tags)
+
+        # TODO: Permissions should be parameterized
+        print(f"Setting up permissions to the endpoint {endpoint_name}...")
+        serving_endpoint_id = w.serving_endpoints.get(endpoint_name).id
+        access_control_list=[
+            ServingEndpointAccessControlRequest(
+                user_name="dummyuser@abc.com",
+                permission_level=ServingEndpointPermissionLevel.CAN_VIEW
+                )]
+        w.serving_endpoints.set_permissions(serving_endpoint_id=serving_endpoint_id, access_control_list=access_control_list)
 
     # If endpoint does exist, update it to serve the new version
     else:
