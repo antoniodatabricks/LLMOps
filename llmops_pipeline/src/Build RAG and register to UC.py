@@ -111,8 +111,6 @@ endpoint_config_dict = {
 
 endpoint_config = EndpointCoreConfigInput.from_dict(endpoint_config_dict)
 
-print(endpoint_config)
-
 deploy_model_serving_endpoint(foundation_endpoint_name, endpoint_config, host)
 
 # COMMAND ----------
