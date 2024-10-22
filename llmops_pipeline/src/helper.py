@@ -1,5 +1,6 @@
 # Databricks notebook source
 import mlflow
+import mlflow.deployments
 from mlflow import MlflowClient
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.workspace import WorkspaceObjectAccessControlRequest, WorkspaceObjectPermissionLevel
@@ -118,6 +119,44 @@ def query_llamaguard(chat, unsafe_categories, llma_guard_endpoint, llma_guard_en
 
 # COMMAND ----------
 
+def query_llamaguard_sdk(chat, unsafe_categories, llma_guard_endpoint_name):
+
+    client = mlflow.deployments.get_deploy_client("databricks")
+
+    query_payload = {
+        "prompt": f"""[INST] Task: Check if there is unsafe content in 'Agent' messages in conversations according our safety policy with the below categories.
+        
+        <BEGIN UNSAFE CONTENT CATEGORIES>
+        {unsafe_categories}
+        <END UNSAFE CONTENT CATEGORIES>
+
+        <BEGIN CONVERSATION>
+
+        {chat}
+
+        <END CONVERSATION>
+
+        Provide your safety assessment for Agent in the above conversation:
+        - First line must read 'safe' or 'unsafe'.
+        - If unsafe, a second line must include a comma-separated list of violated categories. [/INST]"""
+        }
+    
+    response = client.predict(
+            endpoint="llamaguard",
+            inputs=query_payload)
+
+    response_list = response["choices"][0]["text"].split("\n")
+    result = response_list[0].strip()
+
+    if result == "safe":
+        return True, 0
+    else:
+        category = response_list[1].strip()
+
+    return False, category
+
+# COMMAND ----------
+
 def parse_category(code, taxonomy):
     """
     Extracts the first sentence of a category description from a taxonomy based on its code.
@@ -160,6 +199,34 @@ def test_serving_endpoint(endpoint_name, host, token):
             ]
            }
     
+    headers = {"Context-Type": "text/json", "Authorization": f"Bearer {token}"}
+    
+    response = requests.post(
+        url=f"{host}/serving-endpoints/{endpoint_name}/invocations", json=data, headers=headers
+    )
+    
+    # Assert that the status code indicates success (2xx range)
+    assert response.status_code == 200, f"Model Serving Endpoint: Expected status code 200 but got {response.status_code}"
+
+    # You could also use the requests built-in success check:
+    assert response.ok, f"Model Serving Endpoint: Request failed with status code {response.status_code}"
+
+# COMMAND ----------
+
+def test_serving_endpoint_no_pat(endpoint_name, host):
+    
+    data = {
+        "messages": 
+            [ 
+             {
+                 "role": "user", 
+                 "content": "What is GenAI?"
+             }
+            ]
+           }
+    
+    token = dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().get()
+
     headers = {"Context-Type": "text/json", "Authorization": f"Bearer {token}"}
     
     response = requests.post(
