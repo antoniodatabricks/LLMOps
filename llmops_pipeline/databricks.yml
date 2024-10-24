@@ -30,17 +30,17 @@ resources:
             notebook_path: /Workspace/Users/antonio.pinheirofilho@databricks.com/.bundle/llmops_pipeline/development/files/src/Build
               RAG and register to UC
             base_parameters:
-              vs_host: https://adb-3518217342349989.9.azuredatabricks.net
+              vs_host: https://adb-984752964297111.11.azuredatabricks.net
               llma_guard_endpoint_token_scope: creds
               foundation_endpoint_name: meta_llama_v3_1_70b_instruct_endpoint
               model_uc_version: "2"
-              host: https://adb-3518217342349989.9.azuredatabricks.net
+              host: https://adb-984752964297111.11.azuredatabricks.net
               vs_token_secret: pat
               llma_guard_endpoint_token_secret: pat
               model_uc: system.ai.meta_llama_v3_1_70b_instruct
               token_secret: pat
               final_model_name: llmops_dev.model_schema.basic_rag_demo_foundation_model
-              llma_guard_endpoint: https://adb-3518217342349989.9.azuredatabricks.net/serving-endpoints/llamaguard/invocations
+              llma_guard_endpoint: https://adb-984752964297111.11.azuredatabricks.net/serving-endpoints/llamaguard/invocations
               vs_endpoint_name: databricks_docs_vector_search
               token_scope: creds
               embedding_model_name: databricks-gte-large-en
@@ -64,7 +64,7 @@ resources:
               tracking_table_name: ""
               model_name: llmops_dev.model_schema.basic_rag_demo_foundation_model
               endpoint_token_scope: creds
-              endpoint_host: https://adb-3518217342349989.9.azuredatabricks.net
+              endpoint_host: https://adb-984752964297111.11.azuredatabricks.net
               endpoint_name: dev_llm_endpoint
             source: WORKSPACE
           job_cluster_key: llm-cluster
@@ -76,13 +76,13 @@ resources:
               Model
             base_parameters:
               challenger_endpoint_token_secret: pat
-              challenger_endpoint_host: https://adb-3518217342349989.9.azuredatabricks.net
+              challenger_endpoint_host: https://adb-984752964297111.11.azuredatabricks.net
               evaluation_dataset: demo_prep.vector_search_data.eval_set_databricks_documentation
               challenger_endpoint_name: dev_llm_endpoint
               champion_endpoint_token_scope: creds
               challenger_endpoint_token_scope: creds
               champion_endpoint_name: prd_llm_endpoint
-              champion_endpoint_host: https://adb-3518217342349989.9.azuredatabricks.net
+              champion_endpoint_host: https://adb-984752964297111.11.azuredatabricks.net
               champion_endpoint_token_secret: pat_prod
             source: WORKSPACE
           job_cluster_key: llm-cluster
