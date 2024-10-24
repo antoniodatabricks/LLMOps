@@ -8,7 +8,7 @@ resources:
       tasks:
         - task_key: promote_to_dev
           notebook_task:
-            notebook_path: /Repos/LLMOps/LLMOps/llmops_pipeline/src/Promote Model
+            notebook_path: /Workspace/Users/antonio.pinheirofilho@databricks.com/.bundle/llmops_pipeline/development/files/src/Promote Model
             base_parameters:
               source_model: ""
               source_model_version: ""
