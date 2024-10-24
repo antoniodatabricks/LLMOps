@@ -334,7 +334,7 @@ resources:
 targets:
   development:
     workspace:
-      host: https://adb-3518217342349989.9.azuredatabricks.net/
+      host: https://adb-984752964297111.11.azuredatabricks.net/
   qa:
     workspace:
       host: https://adb-3518217342349989.9.azuredatabricks.net/
