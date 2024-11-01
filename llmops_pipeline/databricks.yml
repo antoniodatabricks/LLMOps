@@ -8,7 +8,7 @@ resources:
       tasks:
         - task_key: promote_to_dev
           notebook_task:
-            notebook_path: /Workspace/Users/antonio.pinheirofilho@databricks.com/.bundle/llmops_pipeline/development/files/src/Promote Model
+            notebook_path: /Workspace/Users/xxx@databricks.com/.bundle/llmops_pipeline/development/files/src/Promote Model
             base_parameters:
               source_model: ""
               source_model_version: ""
@@ -27,20 +27,20 @@ resources:
             - task_key: IS_RAG
               outcome: "true"
           notebook_task:
-            notebook_path: /Workspace/Users/antonio.pinheirofilho@databricks.com/.bundle/llmops_pipeline/development/files/src/Build
+            notebook_path: /Workspace/Users/xxx@databricks.com/.bundle/llmops_pipeline/development/files/src/Build
               RAG and register to UC
             base_parameters:
-              vs_host: https://adb-984752964297111.11.azuredatabricks.net
+              vs_host: https://xxx.xx.azuredatabricks.net
               llma_guard_endpoint_token_scope: creds
               foundation_endpoint_name: meta_llama_v3_1_70b_instruct_endpoint
               model_uc_version: "2"
-              host: https://adb-984752964297111.11.azuredatabricks.net
+              host: https://xxx.xx.azuredatabricks.net
               vs_token_secret: pat
               llma_guard_endpoint_token_secret: pat
               model_uc: system.ai.meta_llama_v3_1_70b_instruct
               token_secret: pat
               final_model_name: llmops_dev.model_schema.basic_rag_demo_foundation_model
-              llma_guard_endpoint: https://adb-984752964297111.11.azuredatabricks.net/serving-endpoints/llamaguard/invocations
+              llma_guard_endpoint: https://xxx.xx.azuredatabricks.net/serving-endpoints/llamaguard/invocations
               vs_endpoint_name: databricks_docs_vector_search
               token_scope: creds
               embedding_model_name: databricks-gte-large-en
@@ -55,7 +55,7 @@ resources:
               outcome: "false"
           run_if: AT_LEAST_ONE_SUCCESS
           notebook_task:
-            notebook_path: /Workspace/Users/antonio.pinheirofilho@databricks.com/.bundle/llmops_pipeline/development/files/src/Create
+            notebook_path: /Workspace/Users/xxx@databricks.com/.bundle/llmops_pipeline/development/files/src/Create
               Model Serving Endpoint
             base_parameters:
               tracking_table_schema: ""
@@ -64,7 +64,7 @@ resources:
               tracking_table_name: ""
               model_name: llmops_dev.model_schema.basic_rag_demo_foundation_model
               endpoint_token_scope: creds
-              endpoint_host: https://adb-984752964297111.11.azuredatabricks.net
+              endpoint_host: https://xxx.xx.azuredatabricks.net
               endpoint_name: dev_llm_endpoint
             source: WORKSPACE
           job_cluster_key: llm-cluster
@@ -72,17 +72,17 @@ resources:
           depends_on:
             - task_key: spin_up_endpoint
           notebook_task:
-            notebook_path: /Workspace/Users/antonio.pinheirofilho@databricks.com/.bundle/llmops_pipeline/development/files/src/Evaluate
+            notebook_path: /Workspace/Users/xxx@databricks.com/.bundle/llmops_pipeline/development/files/src/Evaluate
               Model
             base_parameters:
               challenger_endpoint_token_secret: pat
-              challenger_endpoint_host: https://adb-984752964297111.11.azuredatabricks.net
+              challenger_endpoint_host: https://xxx.xx.azuredatabricks.net
               evaluation_dataset: demo_prep.vector_search_data.eval_set_databricks_documentation
               challenger_endpoint_name: dev_llm_endpoint
               champion_endpoint_token_scope: creds
               challenger_endpoint_token_scope: creds
               champion_endpoint_name: prd_llm_endpoint
-              champion_endpoint_host: https://adb-984752964297111.11.azuredatabricks.net
+              champion_endpoint_host: https://xxx.xx.azuredatabricks.net
               champion_endpoint_token_secret: pat_prod
             source: WORKSPACE
           job_cluster_key: llm-cluster
@@ -156,7 +156,7 @@ resources:
               outcome: "true"
           notebook_task:
             base_parameters:
-              host: "https://adb-3518217342349989.9.azuredatabricks.net" # QA environment URL (to be used during REST API calls)
+              host: "https://xxx.xx.azuredatabricks.net" # QA environment URL (to be used during REST API calls)
               token_scope: "creds"  # Databricks secret scope storing credentials
               token_secret: "pat" # Databricks secret containing a PAT for the QA environment
               foundation_endpoint_name: "meta_llama_v3_1_70b_instruct_endpoint"  # Name of the model serving endpoint for the foundation model in the QA environment
@@ -165,10 +165,10 @@ resources:
               embedding_model_name: "databricks-gte-large-en" # Embedding model to be used during context retrieval. This model has to be the same one used while populating the vector search index
               vs_endpoint_name: "databricks_docs_vector_search" # Vector Search Endpoint name for RAG
               vs_index_fullname: "demo_prep.vector_search_data.databricks_documentation_vs_index" # Vector Search Index name for RAG
-              vs_host: "https://adb-3518217342349989.9.azuredatabricks.net" # Environment where the Vector Search Endpoint is hosted
+              vs_host: "https://xxx.xx.azuredatabricks.net" # Environment where the Vector Search Endpoint is hosted
               vs_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the Vector Search Endpoint is hosted
               vs_token_secret: "pat_dev" # Databricks secret containing a PAT for the environment where the Vector Search Endpoint is hosted
-              llma_guard_endpoint: "https://adb-3518217342349989.9.azuredatabricks.net/serving-endpoints/llamaguard/invocations" # Llammaguard endpoint URL for RAG
+              llma_guard_endpoint: "https://xxx.xx.azuredatabricks.net/serving-endpoints/llamaguard/invocations" # Llammaguard endpoint URL for RAG
               llma_guard_endpoint_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the Llammaguard endpoint URL is hosted
               llma_guard_endpoint_token_secret: "pat_dev" # Databricks ssecret containing a PAT for the environment where the Llammaguard endpoint URL is hosted
               final_model_name: "llmops_qa.model_schema.basic_rag_demo_foundation_model" # RAG model name that will be created in the QA catalog
@@ -184,7 +184,7 @@ resources:
             base_parameters:
               model_name: "llmops_qa.model_schema.basic_rag_demo_foundation_model" # Name of the model created in the previous task
               endpoint_name: "qa_llm_endpoint" # Name of the model serving endpoint that will be created in the QA environment
-              endpoint_host: "https://adb-3518217342349989.9.azuredatabricks.net" # Model Serving endpoint environment
+              endpoint_host: "https://xxx.xx.azuredatabricks.net" # Model Serving endpoint environment
               endpoint_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the  Model Serving endpoint is hosted
               endpoint_token_secret: "pat" # Databricks secret containing a PAT for the environment where the Model Serving endpoint is hosted
               tracking_table_catalog: "" # Model Serving Endpoint Inference Table Catalog. Leave it empty if you don't wish to create inference tables for this endpoint
@@ -240,7 +240,7 @@ resources:
               outcome: "true"
           notebook_task:
             base_parameters:
-              host: "https://adb-3518217342349989.9.azuredatabricks.net" # PROD environment URL (to be used during REST API calls)
+              host: "https://xxx.xx.azuredatabricks.net" # PROD environment URL (to be used during REST API calls)
               token_scope: "creds" # Databricks secret scope storing credentials
               token_secret: "pat" # Databricks secret containing a PAT
               foundation_endpoint_name: "meta_llama_v3_1_70b_instruct_endpoint" # Name of the model serving endpoint for the foundation model
@@ -249,10 +249,10 @@ resources:
               embedding_model_name: "databricks-gte-large-en" # Embedding model to be used during context retrieval. This model has to be the same one used while populating the vector search index
               vs_endpoint_name: "databricks_docs_vector_search" # Vector Search Endpoint name for RAG
               vs_index_fullname: "demo_prep.vector_search_data.databricks_documentation_vs_index" # Vector Search Index name for RAG
-              vs_host: "https://adb-3518217342349989.9.azuredatabricks.net" # Environment where the Vector Search Endpoint is hosted
+              vs_host: "https://xxx.xx.azuredatabricks.net" # Environment where the Vector Search Endpoint is hosted
               vs_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the Vector Search Endpoint is hosted
               vs_token_secret: "pat_dev" # Databricks secret containing a PAT for the environment where the Vector Search Endpoint is hosted
-              llma_guard_endpoint: "https://adb-3518217342349989.9.azuredatabricks.net/serving-endpoints/llamaguard/invocations" # Llammaguard endpoint URL for RAG
+              llma_guard_endpoint: "https://xxx.xx.azuredatabricks.net/serving-endpoints/llamaguard/invocations" # Llammaguard endpoint URL for RAG
               llma_guard_endpoint_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the Llammaguard endpoint URL is hosted
               llma_guard_endpoint_token_secret: "pat_dev" # Databricks ssecret containing a PAT for the environment where the Llammaguard endpoint URL is hosted
               final_model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model" # RAG model name that will be created in the DEV catalog
@@ -268,7 +268,7 @@ resources:
             base_parameters:
               model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model" # Name of the model created in the previous task
               endpoint_name: "prod_llm_endpoint" # Name of the model serving endpoint that will be created in the PROD environment
-              endpoint_host: "https://adb-3518217342349989.9.azuredatabricks.net" # Model Serving endpoint environment
+              endpoint_host: "https://xxx.xx.azuredatabricks.net" # Model Serving endpoint environment
               endpoint_token_scope: "creds" # Databricks secret scope storing credentials for the environment where the  Model Serving endpoint is hosted
               endpoint_token_secret: "pat" # Databricks secret containing a PAT for the environment where the Model Serving endpoint is hosted
               tracking_table_catalog: "llmops_prod" # Model Serving Endpoint Inference Table Catalog. Leave it empty if you don't wish to create inference tables for this endpoint
@@ -291,7 +291,7 @@ resources:
           notebook_task:
             base_parameters:
               model_name: "llmops_prod.model_schema.basic_rag_demo_foundation_model" # Model name that the evaludation app will use
-              host: "https://adb-2852242719721132.12.azuredatabricks.net" # Environment where the evaluation app will be hosted
+              host: "https://xxx.xx.azuredatabricks.net" # Environment where the evaluation app will be hosted
             notebook_path: src/Create human evaluation app.py
       queue:
         enabled: true
@@ -334,10 +334,10 @@ resources:
 targets:
   development:
     workspace:
-      host: https://adb-984752964297111.11.azuredatabricks.net/
+      host: https://xxx.xx.azuredatabricks.net/
   qa:
     workspace:
-      host: https://adb-3518217342349989.9.azuredatabricks.net/
+      host: https://xxx.xx.azuredatabricks.net/
   prod:
     workspace:
-      host: https://adb-3518217342349989.9.azuredatabricks.net/
+      host: https://xxx.xx.azuredatabricks.net/
