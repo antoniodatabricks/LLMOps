@@ -41,13 +41,48 @@ tracking_table_name = dbutils.widgets.get("tracking_table_name")
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC # Get Model Optimization Info
+
+# COMMAND ----------
+
+import requests
+import json
+
+optimizable_info = get_model_optimization_info(model_name, model_version, endpoint_host, endpoint_token)
+
+is_optimizable = optimizable_info["optimizable"]
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC # Create Serving Endpoint
 
 # COMMAND ----------
 
 from databricks.sdk.service.serving import EndpointCoreConfigInput
 
-endpoint_config_dict = { 
+endpoint_config_dict = {}
+
+if is_optimizable:
+    chunk_size = optimizable_info['throughput_chunk_size']
+    min_provisioned_throughput = 0
+    max_provisioned_throughput = 2 * chunk_size
+    
+    endpoint_config_dict = { 
+                        "served_entities": [
+                                {
+                                    "entity_name": model_name,
+                                    "entity_version": model_version,
+                                    "workload_size": endpoint_workload_size,
+                                    "scale_to_zero_enabled": endpoint_scale_to_zero,
+                                    "workload_type": endpoint_workload_type,
+                                    "min_provisioned_throughput": min_provisioned_throughput,
+                                    "max_provisioned_throughput": max_provisioned_throughput
+                                }
+                        ]
+                    }
+else:
+    endpoint_config_dict = { 
                         "served_entities": [
                                 {
                                     "entity_name": model_name,
@@ -62,6 +97,7 @@ endpoint_config_dict = {
                                 }
                         ]
                     }
+
 
 if tracking_table_catalog and tracking_table_schema and tracking_table_name:
     endpoint_config_dict["auto_capture_config"] = {
